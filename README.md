@@ -6,7 +6,7 @@ Dublin Bikes description
 
 Run the application:
 
-    make run
+    comp30670_dublinBikes
 
 And open it in the browser at [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 

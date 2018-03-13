@@ -6,7 +6,7 @@ import dublinBikes
 class DublinbikesTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.app = dublinBikes.app.test_client()
+        self.app = dublinBikes.application.test_client()
 
     def test_index(self):
         rv = self.app.get('/')

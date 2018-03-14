@@ -5,7 +5,7 @@ Created on 6 Mar 2018
 '''
 from flask import Flask, render_template
 #from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy import create_engine,MetaData, Table
 
 application = Flask(__name__)
 application.debug = False
@@ -14,8 +14,9 @@ application.debug = False
 #application.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://Admin:dublinBike@dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com:3306/dublinbike' #AWS RDB (external)
 #db = SQLAlchemy(application)
 
-engine = create_engine('mysql+pymysql://Admin:dublinBike@dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com:3306/pets', convert_unicode=True)
+engine = create_engine('mysql+pymysql://Admin:dublinBike@dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com:3306/pets',convert_unicode=True, echo=True)
 metadata = MetaData(bind=engine)
+
 users = Table('cats', metadata, autoload=True)
 #print(users.select(users.c.id == 1).execute().first())
 result = list(engine.execute('select * from cats'))

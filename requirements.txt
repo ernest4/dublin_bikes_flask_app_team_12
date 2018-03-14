@@ -1,3 +1,4 @@
+aniso8601==3.0.0
 arrow==0.12.1
 attrs==17.4.0
 awsebcli==3.12.4
@@ -13,9 +14,10 @@ cookiecutter==1.6.0
 dockerpty==0.4.1
 docopt==0.6.2
 docutils==0.14
--e git+https://github.com/ernest4/dublin_bikes_flask_app_team_12.git@af7e71f486537a0a31d2917ef8d08f79e8923eb8#egg=dublinBikes
+-e git+https://github.com/ernest4/dublin_bikes_flask_app_team_12.git@20d75aa2d91255733d4d5fc1e62d7a77104f678a#egg=dublinBikes
 ez-setup==0.9
 Flask==0.12.2
+Flask-RESTful==0.3.6
 Flask-SQLAlchemy==2.3.2
 flaskSysInfo==1.0
 future==0.16.0
@@ -39,6 +41,7 @@ python-dateutil==2.7.0
 pythonBoilerplate-3==0.0.post0.dev1+gb6fbaf2.dirty
 ## !! Could not determine repository location
 pythonBoilerplate3==0.0.post0.dev1+gb6fbaf2
+pytz==2018.3
 PyYAML==3.12
 requests==2.9.1
 semantic-version==2.5.0

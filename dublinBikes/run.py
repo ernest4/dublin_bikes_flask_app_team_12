@@ -3,7 +3,7 @@ Created on 6 Mar 2018
 
 @author: ernest
 '''
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 #from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, MetaData, Table
 
@@ -29,6 +29,17 @@ print(catsDict['allcats'])
 @application.route('/')
 def index():
     return render_template('index.html', **catsDict)
+
+@application.route('/<yourName>')
+def indexName(yourName):
+    return "Your name is: " + yourName
+
+@application.route('/station')
+def stationRequest():
+    if 'station' in request.args:
+        return "You selected station: " + request.args['station']
+    else:
+        return "No station selected!"
 
 def main():
     application.run(host='0.0.0.0', port=5000)

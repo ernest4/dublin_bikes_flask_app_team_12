@@ -30,6 +30,25 @@ print(catsDict['allcats'])
 def index():
     return render_template('index.html', **catsDict)
 
+LEFT, RIGHT, UP, DOWN, RESET = "left", "right", "up", "down", "reset"
+AVAILABLE_COMMANDS = {'Left': LEFT, 'Right': RIGHT, 'Up': UP, 'Down': DOWN, 'Reset': RESET }
+@application.route('/buttons')
+def execute():
+    return render_template('asyncbuttons.html', commands=AVAILABLE_COMMANDS)
+
+@application.route('/buttons/<cmd>')
+def command(cmd=None):
+    if cmd == RESET:
+        camera_command = "X"
+        response = "(This is from server) Resetting ..."
+    else:
+        camera_command = cmd[0].upper()
+        response = "(This is from server) Moving {}".format(cmd.capitalize())
+
+    # ser.write(camera_command)
+    return response, 200, {'Content-Type': 'text/plain'}
+    #return response
+
 @application.route('/<yourName>')
 def indexName(yourName):
     return "Your name is: " + yourName

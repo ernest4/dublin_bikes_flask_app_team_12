@@ -14,7 +14,7 @@ cookiecutter==1.6.0
 dockerpty==0.4.1
 docopt==0.6.2
 docutils==0.14
--e git+https://github.com/ernest4/dublin_bikes_flask_app_team_12.git@20d75aa2d91255733d4d5fc1e62d7a77104f678a#egg=dublinBikes
+-e git+https://github.com/ernest4/dublin_bikes_flask_app_team_12.git@1ee1888746ff89fdf7f11ccedc8ed2357e23774f#egg=dublinBikes
 ez-setup==0.9
 Flask==0.12.2
 Flask-RESTful==0.3.6

@@ -34,10 +34,12 @@ def index():
 def indexName(yourName):
     return "Your name is: " + yourName
 
-@application.route('/station')
+@application.route('/station', methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
 def stationRequest():
-    if 'station' in request.args:
-        return "You selected station: " + request.args['station']
+    if request.method == 'GET' and 'station' in request.args:
+        return "You selected station (GET result): " + request.args['station']
+    elif request.method == 'POST' and 'station' in request.form:
+        return "You selected station (POST result): " + request.form['station']
     else:
         return "No station selected!"
 
@@ -46,3 +48,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
+    
+    
+    

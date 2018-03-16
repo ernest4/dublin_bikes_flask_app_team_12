@@ -6,6 +6,7 @@ Created on 6 Mar 2018
 from flask import Flask, render_template, request
 #from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, MetaData, Table
+import requests
 
 application = Flask(__name__)
 application.debug = False
@@ -14,6 +15,7 @@ application.debug = False
 #application.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://Admin:dublinBike@dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com:3306/dublinbike' #AWS RDB (external)
 #db = SQLAlchemy(application)
 
+#Database access
 engine = create_engine('mysql+pymysql://Admin:dublinBike@dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com:3306/pets', convert_unicode=True)
 metadata = MetaData(bind=engine)
 users = Table('cats', metadata, autoload=True)
@@ -25,6 +27,12 @@ for row in result:
 
 catsDict = {'allcats' : result}
 print(catsDict['allcats'])
+
+#JCDeaux api requests
+@application.route('/api/<stationnumber>')
+def get_jcd_data(stationnumber=1):
+    station = requests.get('https://api.jcdecaux.com/vls/v1/stations/' + stationnumber + '?contract=dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17').content
+    return station
 
 @application.route('/')
 def index():

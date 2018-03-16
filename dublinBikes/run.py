@@ -6,6 +6,7 @@ Created on 6 Mar 2018
 from flask import Flask, render_template
 #from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine,MetaData, Table
+from dublinBikes import populateStaticTable
 
 application = Flask(__name__)
 application.debug = False
@@ -13,6 +14,8 @@ application.debug = False
 # dialect+driver: (user):(password)@(db_identifier).amazonaws.com:3306/(db_name)
 #application.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://Admin:dublinBike@dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com:3306/dublinbike' #AWS RDB (external)
 #db = SQLAlchemy(application)
+
+#populateStaticTable.populateStaticTable()
 
 engine = create_engine('mysql+pymysql://Admin:dublinBike@dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com:3306/pets',convert_unicode=True, echo=True)
 metadata = MetaData(bind=engine)

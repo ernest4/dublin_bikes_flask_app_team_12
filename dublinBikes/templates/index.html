@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
 <html>
     <head>
         <meta charset="utf-8">
         <title>Dublin bikes</title>
-        <link rel="stylesheet" href="../static/css/normalize.css">
-        <link href="https://fonts.googleapis.com/css?family=Muli|Open+Sans:400,600,700" rel="stylesheet">
         <link rel="stylesheet" href="../static/css/main.css">
-        <link rel="stylesheet" href="../static/css/responsive.css">
+<!--weather.js uses jquery -->
         <script src="/static/js/jquery-3.2.0.min.js"></script>
         <script type="text/javascript" src="../static/js/script.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,8 +12,13 @@
     <body>
         <header>
             <a href="index.html" id="logo">
-                <h1>Dublin Bikes</h1>
-                <h2>Real time tracker</h2>
+                <h1>( logo )Dublin Bikes</h1>
+                <h2>Real time tracker
+									<script src="../static/js/weather.js"></script>
+ 
+					
+				</h2>
+
             </a>
             <nav>
 				<section class="container">
@@ -37,58 +39,27 @@
             </nav>
         </header>
         <div id="wrapper">
-            <h3><i>...tag line goes here... </i></h3>
+            <h3><i> </i></h3>
                 <ul id="sections">
-                    <li class="mapper">
-                            <div id="dublin_map"> </div>	    
-					</li>
-					<li>
-                            <script src="../static/js/weather.js"></script>
-                            <div class="weatherDiv">
-                                <div id="icon">--</div>
-								<p id="currentWeather">--</p>
-                                <div id="weather"></div>
-								<p id="windspeed">--</p>
-                                <p id="currentTemp">--</p>
-                           </div>
-                    </li>
-					<li>
-                       <div id=graphs >
-                            <p>graphs</p>
-                        </div>
-                    </li>
-					<li>
-                        <div id=graphs >
-                            <p>graphs</p>
-                        </div>
-                    </li>
-                    <li>
-          			<li>
 
-                        <div id=graphs >
-                            <p>graphs</p>
-                        </div>
-                    </li>
-                </ul>
-     
+                    <li class="mapper">
+				<div class="weatherDiv" id="overlay">
+							<div id="icon">--</div>
+						<div id="currentWeather">--</div>
+						<div id="windspeed">--</div>
+                            <div id="currentTemp">--</div>
+				
+					   		
+				</div>
+                            <div id="dublin_map"> </div>
+					</li>
+			</ul>
             <footer>
                 <a href="http://twitter.com/colinjohn"><img src="../static/img/twitter-wrap.png" alt="Twitter Logo" class="social-icon"></a>
                 <a href="https://github.com/ernest4/dublin_bikes_flask_app_team_12.git"><img src="../static/img/github-wrap.png" alt="../static/Github Logo" class="social-icon"></a>
                 <p>&copy; 2018 Colin, Ernestas and Wang.</p>
             </footer>
         </div>
-        <script async defer type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key={{ MAPS_APIKEY }}&amp;callback=initialize"></script>
+        <script async defer type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyC1akmKtf1-TNTdoMGmeK5fwpN-g-0y6OU&amp;callback=initialize"></script>
     </body>
-=======
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Dublin Bikes</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  </head>
-  <body>
-    <p>Colin Welcomes you to Dublin Bikes</p>
-    <p>Databse test: {{allcats}}</p>
-  </body>
->>>>>>> 20d75aa2d91255733d4d5fc1e62d7a77104f678a
 </html>

@@ -4,7 +4,7 @@ Created on 16 Mar 2018
 @author: naomiwang
 '''
 
-from sqlalchemy import create_engine, Column,Integer,String,Boolean,Float,ForeignKey
+from sqlalchemy import create_engine, Column,Integer,String,Boolean,Float,ForeignKey,text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import requests,json
@@ -23,7 +23,7 @@ with open('../tests/stations0.json', 'rb') as f:
 #request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content
     
 stationsJson = json.loads(request)
-print(stationsJson[0])
+#print(stationsJson[0])
 for i,item in enumerate(stationsJson):
     #print(stationsJson[i])
     if stationsJson[i]["last_update"] != None:
@@ -54,7 +54,21 @@ class Station(Base):
     lng = Column(Float)
     banking = Column(Boolean)
     bonus = Column(Boolean)
+    
+    #{'number': 42, 'name': 'SMITHFIELD NORTH', 'address': 'Smithfield North', 'position': {'lat': 53.349562, 
+    #'lng': -6.278198}, 'banking': True, 'bonus': False, 'status': 'OPEN', 'contract_name': 'Dublin', 'bike_stands': 30, 'available_bike_stands': 20, 'available_bikes': 10, 'last_update': 1521565405000}
+    '''
+    def __repr__(self):
+        return '[{"id":'+str(self.id)+', "name":"'+self.name+'", "address":"'+self.address+'", "position": {"lat":'+\
+            str(self.lat)+',"lng":'+str(self.lng)+'}, "banking":'+str(self.banking)+',"bonus":'+str(self.bonus)\
+            +'}]'
+    
+    def as_dict(self):
+        return str([{"id":self.id,"name":self.name,"address":self.address,"position":{"lat":self.lat,"lng":self.lng},\
+                 "banking":self.banking,"bonus":self.bonus}])
+    '''
 
+                
 class Dynamic(Base):
     __tablename__ = 'Dynamic'
     
@@ -64,11 +78,28 @@ class Dynamic(Base):
     bikeStands = Column(Integer)
     availableBikeStands = Column(Integer)
     availableBikes = Column(Integer)
-    
+    '''
+    def __repr__(self):
+        return '[{"stationID":'+str(self.stationID)+',"timeStamp":'+str(self.timeStamp)+',"status":"'+self.status\
+            +'","binkStands":'+str(self.bikeStands)+',"availableBikeStands":'+str(self.availableBikeStands)+\
+            ',"availableBikes":'+str(self.availableBikes)+'}]'
+
+
+    def as_dict(self):
+        return [{'st'}]
+    '''
     
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session=Session()
+
+'''
+station=Station(id= 42, name= 'SMITHFIELD NORTH', address= 'Smithfield North', lat= 53.349562, lng= -6.278198, banking= True, bonus= False)
+print(station.as_dict()[125:])
+json.loads(station.__repr__())
+dynamic = Dynamic(stationID=42,timeStamp=1521565405000,status='open',bikeStands=30,availableBikeStands=20,availableBikes=10)
+print(dynamic)
+'''
 
 def populateStaticTable():
     
@@ -99,4 +130,22 @@ def populateDynamicTable():
         except:
             session.rollback()
 #populateDynamicTable()
+
+#def newest(station=None):
+ #   if station == None:
+def query():
+    statement='''
+    select s.id, s.name, s.address, s.lat, s.lng, s.banking, s.bonus, 
+        d.timeStamp, d.status, d.bikeStands, d.availableBikeStands, d.availableBikes
+    from Station as s, (
+        select stationID, timeStamp, status, bikeStands, availableBikeStands, availableBikes
+         from Dynamic, (select stationID as id, max(timeStamp ) as t 
+                         from Dynamic 
+                         group by id) as maxtimes 
+        where stationID=id and timeStamp =t ) as d
+    where s.id = d.stationID
+    '''
+    q=session.query(Station,Dynamic).from_statement(text(statement)).all()
+    print(q)
+query()
     

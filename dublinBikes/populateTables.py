@@ -134,18 +134,32 @@ def populateDynamicTable():
 #def newest(station=None):
  #   if station == None:
 def query():
+    #statement tested on mysql monitor, working.
     statement='''
     select s.id, s.name, s.address, s.lat, s.lng, s.banking, s.bonus, 
         d.timeStamp, d.status, d.bikeStands, d.availableBikeStands, d.availableBikes
     from Station as s, (
         select stationID, timeStamp, status, bikeStands, availableBikeStands, availableBikes
-         from Dynamic, (select stationID as id, max(timeStamp ) as t 
-                         from Dynamic 
-                         group by id) as maxtimes 
+        from Dynamic, (
+                        select stationID as id, max(timeStamp ) as t 
+                        from Dynamic 
+                        group by id) as maxtimes 
         where stationID=id and timeStamp =t ) as d
     where s.id = d.stationID
     '''
-    q=session.query(Station,Dynamic).from_statement(text(statement)).all()
-    print(q)
-query()
+    #q=session.query(Station,Dynamic).from_statement(text(statement1)).all()
+    q=engine.execute(statement)
+    return json.dumps([dict(r) for r in q])
+    '''
+    result=[]
+    for row in q:
+        result.append(row)
+    print(result)
+    j=[]
+    for id,name,address,lat,lng,banking,bonus,timeStamp,status,bikeStands, availableBikeStands, availableBikes in result:
+        j.append(dict["id"]=id)
+    print(j)
+    '''
+    
+#query()
     

@@ -4,9 +4,9 @@ Created on 6 Mar 2018
 @author: ernest
 '''
 from flask import Flask, render_template, request
-from multiprocessing import Process
 from threading import Thread
 import time
+from dublinBikes import populateTables
 
 application = Flask(__name__)
 application.debug = False
@@ -47,18 +47,28 @@ def main():
 
 
 
-def scrapeAPI():
+def scrapeAPIstatic():
     while True:
-        print("Scrapping API...",time.time())
-        time.sleep(60*5)
+        print("Scrapping API... Populating Static data. time=",time.time())
+        populateTables.populateStaticTable()
+        time.sleep(60*60*24) #Every 24 hours
+        
+def scrapeAPIdynamic():
+    while True:
+        print("Scrapping API... Populating Dynamic data. time=",time.time())
+        populateTables.populateDynamicTable()
+        time.sleep(60*5) #Every 5 minutes
 
 @application.route("/api")
 def status():
-    return "API scraper alive: " + str(apiScarepThread.is_alive())
+    return "API scrapers alive: static-> " + str(apiScarepStaticThread.is_alive()) + \
+        " dynamic-> " + str(apiScarepDynamicThread.is_alive())
 
 if __name__ == '__main__':
-    apiScarepThread = Thread(target=scrapeAPI)
-    apiScarepThread.start()
+    apiScarepStaticThread = Thread(target=scrapeAPIstatic)
+    apiScarepStaticThread.start()
+    apiScarepDynamicThread = Thread(target=scrapeAPIdynamic)
+    apiScarepDynamicThread.start()
     
     main()
     

@@ -6,13 +6,17 @@ Created on 6 Mar 2018
 from flask import Flask, render_template, request
 from threading import Thread
 import time
-from dublinBikes import populateTables
+from dublinBikes import myDatabase
 from datetime import datetime
 
 justStarted = True #global var indicating if this the server has just started
 
 application = Flask(__name__)
 application.debug = False
+
+@application.route('/test')
+def jcdAPItoFrontEnd():
+    return myDatabase.query()
 
 @application.route('/')
 def index():
@@ -54,13 +58,13 @@ def scrapeAPIstatic():
         time.sleep(60*2.5)
     while True:
         print("Scrapping API... Populating Static data. Time milis:",time.time()*1000,"Time: ", datetime.fromtimestamp(time.time()))
-        populateTables.populateStaticTable()
+        myDatabase.populateStaticTable()
         time.sleep(60*60*24) #Scrape every 24 hours
         
 def scrapeAPIdynamic():
     while True:
         print("Scrapping API... Populating Dynamic data. Time milis:",time.time()*1000,"Time: ", datetime.fromtimestamp(time.time()))
-        populateTables.populateDynamicTable()
+        myDatabase.populateDynamicTable()
         time.sleep(60*5) #Scrape every 5 minutes
 
 @application.route("/api")

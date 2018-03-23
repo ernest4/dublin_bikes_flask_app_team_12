@@ -154,7 +154,15 @@ def query():
     #q=session.query(Station,Dynamic).from_statement(text(statement1)).all()
     q=engine.execute(statement)
     print("Done.")
-    return json.dumps([dict(r) for r in q])
+    
+    preJSON = [dict(r) for r in q]
+    for r in preJSON:
+        r['number'] = r.pop('id')
+        r['last_update'] = r.pop('timeStamp')
+        r['bike_stands'] = r.pop('bikeStands')
+        r['available_bike_stands'] = r.pop('availableBikeStands')
+        r['available_bikes'] = r.pop('availableBikes')
+    return json.dumps(preJSON)
     '''
     result=[]
     for row in q:

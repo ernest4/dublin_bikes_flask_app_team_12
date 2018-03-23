@@ -113,6 +113,8 @@ def populateStaticTable():
             #session.close()
         except:
             session.rollback()
+            
+    print("populateStaticTable: executed")
 
 #for q in session.query(Station):
 #   print("id:",q.id,"bonus:",q.bonus)
@@ -129,6 +131,8 @@ def populateDynamicTable():
             #session.close()
         except:
             session.rollback()
+            
+    print("populateDynamicTable: executed")
 #populateDynamicTable()
 
 #def newest(station=None):
@@ -149,6 +153,7 @@ def query():
     '''
     #q=session.query(Station,Dynamic).from_statement(text(statement1)).all()
     q=engine.execute(statement)
+    print("Done.")
     return json.dumps([dict(r) for r in q])
     '''
     result=[]

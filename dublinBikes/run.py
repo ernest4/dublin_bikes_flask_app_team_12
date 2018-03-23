@@ -7,6 +7,9 @@ from flask import Flask, render_template, request
 from threading import Thread
 import time
 from dublinBikes import populateTables
+from datetime import datetime
+
+justStarted = True #global var indicating if this the server has just started
 
 application = Flask(__name__)
 application.debug = False
@@ -17,6 +20,7 @@ def index():
 
 LEFT, RIGHT, UP, DOWN, RESET = "left", "right", "up", "down", "reset"
 AVAILABLE_COMMANDS = {'Left': LEFT, 'Right': RIGHT, 'Up': UP, 'Down': DOWN, 'Reset': RESET }
+
 @application.route('/buttons')
 def execute():
     return render_template('asyncbuttons.html', commands=AVAILABLE_COMMANDS)
@@ -42,33 +46,37 @@ def stationRequest():
     else:
         return "No station selected!"
 
-def main():
-    application.run(host='0.0.0.0', port=5000, use_reloader=False)
-
-
-
+#Scraping JCDeaux API
 def scrapeAPIstatic():
+    global justStarted
+    if justStarted == True: #Create a little lag between static and dynamic scrapers to prevent simultaneous write to database
+        justStarted = False
+        time.sleep(60*2.5)
     while True:
-        print("Scrapping API... Populating Static data. time=",time.time())
+        print("Scrapping API... Populating Static data. Time milis:",time.time()*1000,"Time: ", datetime.fromtimestamp(time.time()))
         populateTables.populateStaticTable()
-        time.sleep(60*60*24) #Every 24 hours
+        time.sleep(60*60*24) #Scrape every 24 hours
         
 def scrapeAPIdynamic():
     while True:
-        print("Scrapping API... Populating Dynamic data. time=",time.time())
+        print("Scrapping API... Populating Dynamic data. Time milis:",time.time()*1000,"Time: ", datetime.fromtimestamp(time.time()))
         populateTables.populateDynamicTable()
-        time.sleep(60*5) #Every 5 minutes
+        time.sleep(60*5) #Scrape every 5 minutes
 
 @application.route("/api")
 def status():
-    return "API scrapers alive: static-> " + str(apiScarepStaticThread.is_alive()) + \
-        " dynamic-> " + str(apiScarepDynamicThread.is_alive())
+    return "API scrapers <b>alive</b>:<br> Static: " + str(apiScarepStaticThread.is_alive()) + \
+        " <br>Dynamic: " + str(apiScarepDynamicThread.is_alive())
+        
+def main():
+    application.run(host='0.0.0.0', port=5000, use_reloader=False)
 
 if __name__ == '__main__':
-    apiScarepStaticThread = Thread(target=scrapeAPIstatic)
-    apiScarepStaticThread.start()
+    #Create and start the JCD API scraper threads for static and dynamic data scraping
     apiScarepDynamicThread = Thread(target=scrapeAPIdynamic)
     apiScarepDynamicThread.start()
+    apiScarepStaticThread = Thread(target=scrapeAPIstatic)
+    apiScarepStaticThread.start()
     
     main()
     

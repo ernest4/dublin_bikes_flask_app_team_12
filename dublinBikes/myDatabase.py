@@ -13,14 +13,14 @@ import requests,json
 
 #Test Json file, comment out when using real API
 global request
-with open('../tests/stations0.json', 'rb') as f:
+#with open('../tests/stations0.json', 'rb') as f:
     #print("reading the file")
-    request = f.read()
+ #   request = f.read()
     #print("Finished.")
 # End here
 
 # Activate this line if pass test
-#request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content
+request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content
     
 stationsJson = json.loads(request)
 #print(stationsJson[0])

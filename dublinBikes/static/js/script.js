@@ -13,9 +13,7 @@ function initialize() {
 
     // Information for API call
 	// Colins key
-    var NAME="Dublin";
-    var APIKEY="b3cd5493b4afcaa34ec3f98453204675c656cb35";
-    var url="https://api.jcdecaux.com/vls/v1/stations?contract=" + NAME + "&apiKey=" + APIKEY;
+    var url="/jcdapi"
 
     // Station coordinates are retrieved from JSON  data
     var xmlhttp = new XMLHttpRequest();

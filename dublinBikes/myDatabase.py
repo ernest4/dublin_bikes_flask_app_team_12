@@ -20,7 +20,7 @@ global request
 # End here
 
 # Activate this line if pass test
-request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content
+request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content.decode('utf-8')
     
 stationsJson = json.loads(request)
 #print(stationsJson[0])

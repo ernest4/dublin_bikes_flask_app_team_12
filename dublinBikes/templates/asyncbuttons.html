@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Dublin Bikes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  
+  <body>
+  	<p>The buttons below are generated using templates</p>
+  
+  	<br>
+  	
+    {% for label, command in commands.items() %}
+    <button class="command command-{{ command }}" value="{{ command }}">
+        {{ label }}
+    </button>
+    {% endfor %}
+    
+    <br>
+    
+    <p>Once any of above buttons will be clicked the text below will be a response string received from the server asynchronously (without having to refresh the page!)</p>
+  
+  	<br>
+    
+    <p id=test1>TEST</p>
+    
+	<script>
+	// Only run what comes next *after* the page has loaded
+		
+	addEventListener("DOMContentLoaded", function() {
+  		// Grab all of the elements with a class of command
+  		// (which all of the buttons we just created have)
+  		
+  		var commandButtons = document.querySelectorAll(".command");
+  		for (var i=0, l=commandButtons.length; i<l; i++) {
+    		// For each button, listen for the "click" event
+    			
+    		commandButtons[i].addEventListener("click", function(e) {
+     			// When a click happens, stop the button
+      			// from submitting our form (if we have one)
+      			
+      			e.preventDefault();
+
+      			// Now we need to send the data to our server
+      			// without reloading the page - this is the domain of
+      			// AJAX (Asynchronous JavaScript And XML)
+      			// We will create a new request object
+      			// and set up a handler for the response
+      		
+      			var request = new XMLHttpRequest();
+      			request.onload = function() {
+        			// We could do more interesting things with the response
+        			// or, we could ignore it entirely
+        			
+        			document.getElementById("test1").innerHTML = request.responseText;
+      			};
+      	
+      			// We point the request at the appropriate command
+      			request.open("GET", "/buttons/" + e.target.value, true);
+      			// and then we send it off
+      			request.send();
+    		});
+  		}
+	}, true);
+	</script>
+  </body>
+</html>

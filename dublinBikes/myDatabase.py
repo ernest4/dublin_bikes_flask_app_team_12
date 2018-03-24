@@ -162,6 +162,9 @@ def query():
         r['bike_stands'] = r.pop('bikeStands')
         r['available_bike_stands'] = r.pop('availableBikeStands')
         r['available_bikes'] = r.pop('availableBikes')
+        r['banking'] = bool(r['banking'])
+        r['bonus'] = bool(r['bonus'])
+        r['position'] = {"lat" : r.pop('lat'), "lng" : r.pop('lng')}
     return json.dumps(preJSON)
     '''
     result=[]

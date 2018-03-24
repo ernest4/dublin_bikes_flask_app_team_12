@@ -130,21 +130,12 @@ def populateDynamicTable(stationsJson):
         dynamic = Dynamic(stationID=s["number"],timeStamp=s["last_update"],status = s["status"],
                           bikeStands = s["bike_stands"],availableBikeStands = s["available_bike_stands"],
                           availableBikes = s["available_bikes"])
-        if dynamic.stationID == 42:
-            print(dynamic.stationID," ",dynamic.timeStamp)
         try:
             session.add(dynamic)
-            if dynamic.stationID == 42: #testing
-                print(dynamic.stationID,": Add successfully.")
             session.commit()
-            if dynamic.stationID == 42:
-                print(dynamic.stationID,": Commit successfully.")
             #session.close()
-        except Exception as e:
+        except:
             session.rollback()
-            if dynamic.stationID == 42:
-                print(dynamic.stationID,": Had to rollback...")
-                print(e)
         finally:
             session.close()
             

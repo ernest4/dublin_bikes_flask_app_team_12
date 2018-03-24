@@ -15,21 +15,24 @@ import requests,json
 global request
 #with open('../tests/stations0.json', 'rb') as f:
     #print("reading the file")
- #   request = f.read()
+#   request = f.read()
     #print("Finished.")
 # End here
 
 # Activate this line if pass test
-request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content.decode('utf-8')
+def getJCD():
+    request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content.decode('utf-8')
     
-stationsJson = json.loads(request)
-#print(stationsJson[0])
-for i,item in enumerate(stationsJson):
-    #print(stationsJson[i])
-    if stationsJson[i]["last_update"] != None:
-        stationsJson[i]["last_update"]//=1000
-    else:
-        pass
+    stationsJson = json.loads(request)
+    #print(stationsJson[0])
+    for i,item in enumerate(stationsJson):
+        #print(stationsJson[i])
+        if stationsJson[i]["last_update"] != None:
+            stationsJson[i]["last_update"]//=1000
+        else:
+            pass
+        
+    return stationsJson
 #print(stationsJson[0]["last_update"])
 #print(stationsJson[0]["banking"])
 #for station in stationsJson:
@@ -101,7 +104,7 @@ dynamic = Dynamic(stationID=42,timeStamp=1521565405000,status='open',bikeStands=
 print(dynamic)
 '''
 
-def populateStaticTable():
+def populateStaticTable(stationsJson):
     
     for s in stationsJson:
         station = Station(id=s["number"],name=s["name"],address=s["address"],lat=s["position"]["lat"],
@@ -113,6 +116,8 @@ def populateStaticTable():
             #session.close()
         except:
             session.rollback()
+        finally:
+            session.close()
             
     print("populateStaticTable: executed")
 
@@ -120,23 +125,34 @@ def populateStaticTable():
 #   print("id:",q.id,"bonus:",q.bonus)
 #populateStaticTable()
 
-def populateDynamicTable():
+def populateDynamicTable(stationsJson):
     for s in stationsJson:
         dynamic = Dynamic(stationID=s["number"],timeStamp=s["last_update"],status = s["status"],
                           bikeStands = s["bike_stands"],availableBikeStands = s["available_bike_stands"],
                           availableBikes = s["available_bikes"])
+        if dynamic.stationID == 42:
+            print(dynamic.stationID," ",dynamic.timeStamp)
         try:
             session.add(dynamic)
+            if dynamic.stationID == 42: #testing
+                print(dynamic.stationID,": Add successfully.")
             session.commit()
+            if dynamic.stationID == 42:
+                print(dynamic.stationID,": Commit successfully.")
             #session.close()
-        except:
+        except Exception as e:
             session.rollback()
+            if dynamic.stationID == 42:
+                print(dynamic.stationID,": Had to rollback...")
+                print(e)
+        finally:
+            session.close()
             
     print("populateDynamicTable: executed")
 #populateDynamicTable()
 
 #def newest(station=None):
- #   if station == None:
+#   if station == None:
 def query():
     #statement tested on mysql monitor, working.
     statement='''
@@ -153,7 +169,6 @@ def query():
     '''
     #q=session.query(Station,Dynamic).from_statement(text(statement1)).all()
     q=engine.execute(statement)
-    print("Done.")
     
     preJSON = [dict(r) for r in q]
     for r in preJSON:
@@ -165,6 +180,8 @@ def query():
         r['banking'] = bool(r['banking'])
         r['bonus'] = bool(r['bonus'])
         r['position'] = {"lat" : r.pop('lat'), "lng" : r.pop('lng')}
+        
+    print("query: executed")
     return json.dumps(preJSON)
     '''
     result=[]

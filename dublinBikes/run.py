@@ -9,7 +9,10 @@ import time
 from dublinBikes import myDatabase
 from datetime import datetime
 
+#global vars
 justStarted = True #global var indicating if this the server has just started
+dynamicAPIlastScrape = ""
+staticAPIlastScrape = ""
 
 application = Flask(__name__)
 application.debug = False
@@ -25,25 +28,31 @@ def jcdAPItoFrontEnd():
 @application.route("/api") #For debugging, check the JCD API scraper status
 def status():
     return "API scrapers <b>alive</b>:<br> Static: " + str(apiScarepStaticThread.is_alive()) + \
-        " <br>Dynamic: " + str(apiScarepDynamicThread.is_alive())
+        " <br>Dynamic: " + str(apiScarepDynamicThread.is_alive()) + \
+        "<br><br>Last update:<br> Static [every 24h]: " + staticAPIlastScrape + \
+        " <br>Dynamic [every 5 minutes]: " + dynamicAPIlastScrape
 
 
 
 #Scraping JCDeaux API
 def scrapeAPIstatic():
     global justStarted
+    global staticAPIlastScrape
     if justStarted == True: #Create a little lag between static and dynamic scrapers to prevent simultaneous write to database
         justStarted = False
         time.sleep(60*2.5)
     while True:
-        print("Scrapping API... Populating Static data. Time milis:",time.time()*1000,"Time: ", datetime.fromtimestamp(time.time()))
-        myDatabase.populateStaticTable()
+        staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
+        print(staticAPIlastScrape)
+        myDatabase.populateStaticTable(myDatabase.getJCD())
         time.sleep(60*60*24) #Scrape every 24 hours
         
 def scrapeAPIdynamic():
+    global dynamicAPIlastScrape
     while True:
-        print("Scrapping API... Populating Dynamic data. Time milis:",time.time()*1000,"Time: ", datetime.fromtimestamp(time.time()))
-        myDatabase.populateDynamicTable()
+        dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
+        print(dynamicAPIlastScrape)
+        myDatabase.populateDynamicTable(myDatabase.getJCD())
         time.sleep(60*5) #Scrape every 5 minutes
         
         

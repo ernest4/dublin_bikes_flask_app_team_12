@@ -47,18 +47,18 @@ def scrapeAPIdynamic():
         time.sleep(60*5) #Scrape every 5 minutes
         
         
+apiScarepDynamicThread = Thread(target=scrapeAPIdynamic)
+apiScarepStaticThread = Thread(target=scrapeAPIstatic)
         
 def main():
+    #Create and start the JCD API scraper threads for static and dynamic data scraping
+    apiScarepDynamicThread.start()
+    apiScarepStaticThread.start()
+    
     application.run(host='0.0.0.0', port=5000, use_reloader=False)
     
 
 if __name__ == '__main__':
-    #Create and start the JCD API scraper threads for static and dynamic data scraping
-    apiScarepDynamicThread = Thread(target=scrapeAPIdynamic)
-    apiScarepDynamicThread.start()
-    apiScarepStaticThread = Thread(target=scrapeAPIstatic)
-    apiScarepStaticThread.start()
-    
     main()
     
     

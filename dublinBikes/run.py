@@ -27,42 +27,43 @@ def jcdAPItoFrontEnd():
 
 @application.route("/api") #For debugging, check the JCD API scraper status
 def status():
-    return "API scrapers <b>alive</b>:<br> Static: " + str(apiScarepStaticThread.is_alive()) + \
-        " <br>Dynamic: " + str(apiScarepDynamicThread.is_alive()) + \
+    return "API scrapers <b>alive</b>: " + str(apiScarepThread.is_alive()) + \
         "<br><br>Last update:<br> Static [every 24h]: " + staticAPIlastScrape + \
         " <br>Dynamic [every 5 minutes]: " + dynamicAPIlastScrape
 
 
 
 #Scraping JCDeaux API
-def scrapeAPIstatic():
+def scrapeJCDAPI():
     global justStarted
     global staticAPIlastScrape
-    if justStarted == True: #Create a little lag between static and dynamic scrapers to prevent simultaneous write to database
-        justStarted = False
-        time.sleep(60*2.5)
-    while True:
-        staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
-        print(staticAPIlastScrape)
-        myDatabase.populateStaticTable(myDatabase.getJCD())
-        time.sleep(60*60*24) #Scrape every 24 hours
-        
-def scrapeAPIdynamic():
     global dynamicAPIlastScrape
-    while True:
-        dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
-        print(dynamicAPIlastScrape)
-        myDatabase.populateDynamicTable(myDatabase.getJCD())
-        time.sleep(60*5) #Scrape every 5 minutes
+    
+    scrapeCount = 0
+    
+    while True: #Run for as long as the server is active...
         
-        
-apiScarepDynamicThread = Thread(target=scrapeAPIdynamic)
-apiScarepStaticThread = Thread(target=scrapeAPIstatic)
+        jcdAPIquery = myDatabase.getJCD()
+        if scrapeCount == 288 or justStarted == True: # Run when server launches. Then about every 24h...
+            justStarted = False
+            scrapeCount = 0
+            staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
+            print(staticAPIlastScrape)
+            myDatabase.populateStaticTable(jcdAPIquery)
+        else: # Run about every 5 minutes...
+            scrapeCount += 1
+            dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
+            print(dynamicAPIlastScrape)
+            myDatabase.populateDynamicTable(jcdAPIquery)
+            
+        time.sleep(60*5) #Scrape about every 5 minutes...
+            
+            
+apiScarepThread = Thread(target=scrapeJCDAPI)
         
 def main():
-    #Create and start the JCD API scraper threads for static and dynamic data scraping
-    apiScarepDynamicThread.start()
-    apiScarepStaticThread.start()
+    #Create and start the JCD API scraper thread for static and dynamic data scraping
+    apiScarepThread.start()
     
     application.run(host='0.0.0.0', port=5000, use_reloader=False)
     

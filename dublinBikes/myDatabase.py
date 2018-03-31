@@ -4,18 +4,19 @@ Created on 16 Mar 2018
 @author: naomiwang
 '''
 
-from sqlalchemy import create_engine, Column,Integer,String,Boolean,Float,ForeignKey,text
+from sqlalchemy import create_engine, Column,Integer,String,Boolean,Float,ForeignKey,DateTime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import requests,json
+import datetime
 
 #  mysql -h dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com -P 3306 -u Admin -p
 
 #Test Json file, comment out when using real API
-global request
+#global request
 #with open('../tests/stations0.json', 'rb') as f:
     #print("reading the file")
-#   request = f.read()
+ #   request = f.read()
     #print("Finished.")
 # End here
 
@@ -25,10 +26,15 @@ def getJCD():
     
     stationsJson = json.loads(request)
     #print(stationsJson[0])
+    
     for i,item in enumerate(stationsJson):
         #print(stationsJson[i])
         if stationsJson[i]["last_update"] != None:
             stationsJson[i]["last_update"]//=1000
+            stationsJson[i]["last_update"] = datetime.datetime.fromtimestamp(stationsJson[i]["last_update"])
+            #print("datetime:",stationsJson[i]["last_update"])
+            # Just in case I want to use weekday later:
+            #datetime.fromtimestamp(ep/1000).strftime("%A")
         else:
             pass
         
@@ -73,10 +79,11 @@ class Station(Base):
 
                 
 class Dynamic(Base):
+    #! Mind here the table name
     __tablename__ = 'Dynamic'
     
     stationID = Column(Integer,ForeignKey('Station.id'),primary_key=True)
-    timeStamp = Column(Integer(),primary_key=True)
+    timeStamp = Column(DateTime(),primary_key=True)
     status = Column(String(100))
     bikeStands = Column(Integer)
     availableBikeStands = Column(Integer)
@@ -140,7 +147,7 @@ def populateDynamicTable(stationsJson):
             session.close()
             
     print("populateDynamicTable: executed")
-#populateDynamicTable()
+
 
 #def newest(station=None):
 #   if station == None:
@@ -186,4 +193,19 @@ def query():
     '''
     
 #query()
+
+def weeklyAvailableBikes(stationID):
+    query='''
+    select hour(from_unixtime(timeStamp)) as Hour, dayofweek(from_unixtime(timeStamp)) as Weekday,
+     avg(availableBikes ) as avgAvailableBikes 
+     from Dynamic where stationID='''+str(stationID)+'''
+     group by hour(from_unixtime(timeStamp)), dayofweek(from_unixtime(timeStamp))'''
+
+    q=engine.execute(query)
+    
+    l = [dict(r) for r in q]
+    #print(l)
+    #l[0]['avgAvailableBikes']
+    return l
+#weeklyAvailableBikes(42)
     

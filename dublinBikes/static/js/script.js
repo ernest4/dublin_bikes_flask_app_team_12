@@ -1,4 +1,5 @@
-
+var station="";
+var infoBox = "";
 function initialize() {
 
     var mapOptions = {
@@ -11,22 +12,19 @@ function initialize() {
 
     var map=new google.maps.Map(document.getElementById("dublin_map"),mapOptions);
 
-    // Information for API call
-	// Colins key
-    var NAME="Dublin";
-    var APIKEY="b3cd5493b4afcaa34ec3f98453204675c656cb35";
-    var url="https://api.jcdecaux.com/vls/v1/stations?contract=" + NAME + "&apiKey=" + APIKEY;
+
+    var url="/jcdapi"
 
     // Station coordinates are retrieved from JSON  data
     var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 data = JSON.parse(xmlhttp.responseText);
+				console.log(data);
 
                 for (i=0;i<=data.length;i++) {
 
                     var colour;
-                    if (data[i].number==16) {continue;}
                     if (data[i].available_bikes/data[i].bike_stands == 0) {
                         colour = 'red';
                     }else if (0.2 <= data[i].available_bikes/data[i].bike_stands > 0.9) {
@@ -47,32 +45,69 @@ function initialize() {
                         center: {lat: data[i].position.lat, lng: data[i].position.lng},
                     });
 
-                    var infoBox =
-                        "<h3 style=\"margin:2px;\">" + 
+                    infoBox =
+                        "<h3 id=\"st_add\" style=\"margin:2px;\">" + 
                         data[i].address + 
                         "</h2><span style=\"text-align:center;font-size:10px;color:black;\">Bikes: " + data[i].available_bikes + "</br>Docking Stations: " 
                         + data[i].available_bike_stands +
-						 "</h2><span style=\"text-align:center;font-size:10px;color:black;\"></br>Other info:   station distance from user " +
-						 "</h2><span style=\"text-align:center;font-size:10px;color:black;\"></br>Other info:   likelihood of getting a bike within 15 mins:" +
-						 "</h2><span style=\"text-align:center;font-size:10px;color:black;\"></br>Other info:   likelihood of getting a space within the hour based on analytics:" 
-						 +"</span></br></br><a style=\"font-size:10px;\" href=\"http://maps.google.com/maps?q=" + data[i].position.lat+","+data[i].position.lng +
-                        "\" target=\"_blank\">View in Google Maps</a></span>"
+						// "<br/><button onclick=\"on("+data[i].available_bikes+")\">... click for more detail...</button>"    
+					// passing an int works but not a string ??
+						 "<br/><button onclick=\"on(\'"+ data[i].address+ "\')\">... click for more detail...</button>"
+					
                     ;
-                    
-                    makeClickable(map, circle, infoBox);
+					console.log(data[i].address)
+                   makeClickable(map, circle, infoBox);
                 }
             }
         }
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
 }
+
+
+	///////////////////////////////////
+	////////////// overlay ////////////
+	///////////////////////////////////
+
+
+function on(number) {
+    document.getElementById("overlay").style.display = "block";
+	document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + number;
+	
+}
+
+function off() {
+    document.getElementById("overlay").style.display = "none";
+	// run query on database 
+	// select all from DB where num = num;
+	// getElementByID
+}
+
+	///////////////////////////////////
+	///////////////////////////////////
+	///////////////////////////////////
+
+
 function makeClickable(map, circle, info) {
+
      var infowindow = new google.maps.InfoWindow({
          content: info
+
      });
-     // Display information on click
+   
      google.maps.event.addListener(circle, 'click', function(ev) {
+//	 var currentInfoWindow = null;
+//	   if (currentInfoWindow != null) {
+//		   currentInfoWindow.close();
+//	   }
        infowindow.setPosition(circle.getCenter());
        infowindow.open(map);
+	  // currentInfoWindow = infowindow;
      });
+}
+
+function hideAllMarkers(map) {
+	circle.forEach(function(circle){
+		circle.infowindow.close(map,circle);	   
+				   });
 }

@@ -4,11 +4,11 @@ Created on 16 Mar 2018
 @author: naomiwang
 '''
 
-from sqlalchemy import create_engine, Column,Integer,String,Boolean,Float,ForeignKey,DateTime
+from sqlalchemy import create_engine, Column,Integer,String,Boolean,Float,ForeignKey
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import requests,json
-import datetime
+import sys
 
 #  mysql -h dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com -P 3306 -u Admin -p
 
@@ -22,23 +22,34 @@ import datetime
 
 # Activate this line if pass test
 def getJCD():
-    request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content.decode('utf-8')
-    
-    stationsJson = json.loads(request)
+    try:
+        request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content.decode('utf-8')
+        try:
+            stationsJson = json.loads(request)
     #print(stationsJson[0])
     
-    for i,item in enumerate(stationsJson):
-        #print(stationsJson[i])
-        if stationsJson[i]["last_update"] != None:
-            stationsJson[i]["last_update"]//=1000
-            stationsJson[i]["last_update"] = datetime.datetime.fromtimestamp(stationsJson[i]["last_update"])
-            #print("datetime:",stationsJson[i]["last_update"])
-            # Just in case I want to use weekday later:
-            #datetime.fromtimestamp(ep/1000).strftime("%A")
-        else:
-            pass
+            for item in stationsJson:
+                #print(stationsJson[i])
+                if item["last_update"] != None:
+                    item["last_update"]//=1000
+                    #stationsJson[i]["last_update"] = datetime.datetime.fromtimestamp(stationsJson[i]["last_update"])
+                    #print("datetime:",stationsJson[i]["last_update"])
+                    # Just in case I want to use weekday later:
+                    #datetime.fromtimestamp(ep/1000).strftime("%A")
+                else:
+                    pass
+            return stationsJson
         
-    return stationsJson
+        except ValueError as e:
+            print(e)
+            sys.exit(1)
+    
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        print(e)
+        sys.exit(1)
+    
+    
+    
 #print(stationsJson[0]["last_update"])
 #print(stationsJson[0]["banking"])
 #for station in stationsJson:
@@ -83,7 +94,7 @@ class Dynamic(Base):
     __tablename__ = 'Dynamic'
     
     stationID = Column(Integer,ForeignKey('Station.id'),primary_key=True)
-    timeStamp = Column(DateTime(),primary_key=True)
+    timeStamp = Column(Integer,primary_key=True)
     status = Column(String(100))
     bikeStands = Column(Integer)
     availableBikeStands = Column(Integer)
@@ -167,7 +178,7 @@ def query():
     '''
     #q=session.query(Station,Dynamic).from_statement(text(statement1)).all()
     q=engine.execute(statement)
-    
+
     preJSON = [dict(r) for r in q]
     for r in preJSON:
         r['number'] = r.pop('id')

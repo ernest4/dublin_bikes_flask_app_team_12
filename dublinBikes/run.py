@@ -8,6 +8,7 @@ from threading import Thread
 import time
 from dublinBikes import myDatabase
 from datetime import datetime
+import json
 
 #global vars
 justStarted = True #global var indicating if this the server has just started
@@ -25,9 +26,22 @@ def index():
 def jcdAPItoFrontEnd():
     return application.response_class(response=myDatabase.query(), status=200, mimetype='application/json')
 
-@application.route('/weekly')
-def weeklyJSONtoFrontEnd():
-    pass
+@application.route('/weekly/<stationNumber>')
+def weeklyJSONtoFrontEnd(stationNumber):
+    queryResult = myDatabase.weeklyAvailableBikes(stationNumber)
+    #print(json.dumps(queryResult))
+    
+    #preparing JSON for front end
+    #for dictionary in queryResult:
+    #    for key in dictionary:
+    #        if key == "Hour":
+    #            print(dictionary[key])
+        
+    return application.response_class(response=json.dumps(queryResult), status=200, mimetype='application/json')
+
+@application.route("/testplot")
+def testPlot():
+    return render_template('testPlot.html')
 
 @application.route("/api") #For debugging, check the JCD API scraper status
 def status():
@@ -67,7 +81,7 @@ apiScarepThread = Thread(target=scrapeJCDAPI)
         
 def main():
     #Create and start the JCD API scraper thread for static and dynamic data scraping
-    apiScarepThread.start()
+    #apiScarepThread.start() #TURNED OFF WHEN TESTING LOCALLY, UNCOMMENT THIS WHEN PUSHING TO EC2 !!!!
     
     application.run(host='0.0.0.0', port=5000, use_reloader=False)
     

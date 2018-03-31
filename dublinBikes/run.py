@@ -25,6 +25,10 @@ def index():
 def jcdAPItoFrontEnd():
     return application.response_class(response=myDatabase.query(), status=200, mimetype='application/json')
 
+@application.route('/weekly')
+def weeklyJSONtoFrontEnd():
+    pass
+
 @application.route("/api") #For debugging, check the JCD API scraper status
 def status():
     return "API scrapers <b>alive</b>: " + str(apiScarepThread.is_alive()) + \

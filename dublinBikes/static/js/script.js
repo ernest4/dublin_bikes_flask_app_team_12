@@ -111,3 +111,4 @@ function hideAllMarkers(map) {
 		circle.infowindow.close(map,circle);	   
 				   });
 }
+

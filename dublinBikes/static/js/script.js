@@ -20,7 +20,6 @@ function initialize() {
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 data = JSON.parse(xmlhttp.responseText);
-				console.log(data);
 
                 for (i=0;i<=data.length;i++) {
 
@@ -52,10 +51,10 @@ function initialize() {
                         + data[i].available_bike_stands +
 						// "<br/><button onclick=\"on("+data[i].available_bikes+")\">... click for more detail...</button>"    
 					// passing an int works but not a string ??
-						 "<br/><button onclick=\"on(\'"+ data[i].address+ "\')\">... click for more detail...</button>"
+						 "<br/><button onclick=\"on(\'"+ i+ "\')\">... click for more detail...</button>"
 					
                     ;
-					console.log(data[i].address)
+				
                    makeClickable(map, circle, infoBox);
                 }
             }
@@ -69,12 +68,26 @@ function initialize() {
 	////////////// overlay ////////////
 	///////////////////////////////////
 
+var weekly_data;
 
-function on(number) {
+function on(st_ID) {
     document.getElementById("overlay").style.display = "block";
-	document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + number;
+	//document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + st_ID;
 	
+	var path = '/weekly/'+st_ID;
+	
+    var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange=function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+               
+                weekly_data = JSON.parse(xmlhttp.responseText);
+				drawChart();
+			}
+		}
+        xmlhttp.open("GET", path, true);
+        xmlhttp.send();
 }
+
 
 function off() {
     document.getElementById("overlay").style.display = "none";
@@ -92,17 +105,10 @@ function makeClickable(map, circle, info) {
 
      var infowindow = new google.maps.InfoWindow({
          content: info
-
      });
-   
      google.maps.event.addListener(circle, 'click', function(ev) {
-//	 var currentInfoWindow = null;
-//	   if (currentInfoWindow != null) {
-//		   currentInfoWindow.close();
-//	   }
        infowindow.setPosition(circle.getCenter());
        infowindow.open(map);
-	  // currentInfoWindow = infowindow;
      });
 }
 
@@ -112,3 +118,80 @@ function hideAllMarkers(map) {
 				   });
 }
 
+////////////////////// draw stuff /////////////////////////////
+function drawChart() {
+	
+	
+				var mondaybike = 0;
+				var tuesdayBike = 0;
+				var wednesdayBike = 0;
+				var thursdayBike = 0;
+				var fridayBike = 0;
+				var saturdayBike = 0;
+				var sundayBike = 0;
+				
+				 for (i=0;i<=weekly_data.length-1;i++) {	
+					 if (weekly_data[i].Weekday == 0 ) {
+						 mondayBike = mondayBike + weekly_data[i].avgAvailableBikes;
+					 } 	
+					 else if (weekly_data[i].Weekday == 1 ) {
+						 tuesdayBike = tuesdayBike + weekly_data[i].avgAvailableBikes;
+					 }
+					 else if (weekly_data[i].Weekday == 2 ) {
+						 wednesdayBike = wednesdayBike + weekly_data[i].avgAvailableBikes;
+					 }
+					 else if (weekly_data[i].Weekday == 3 ) {
+						 thursdayBike = thursdayBike + weekly_data[i].avgAvailableBikes;
+					 }
+					 else if (weekly_data[i].Weekday == 4 ) {
+						 fridayBike = fridayBike + weekly_data[i].avgAvailableBikes;
+					 }					 
+					 else if (weekly_data[i].Weekday == 5 ) {
+						 saturdayBike = saturdayBike + weekly_data[i].avgAvailableBikes;
+					 }					 
+					 else if (weekly_data[i].Weekday == 6 ) {
+						 sundayBike = sundayBike + weekly_data[i].avgAvailableBikes;
+					 }					 	 					  	
+				 }
+				monAvg = mondaybike;
+				tuesAvg = tuesdayBike / 24;
+				wedAvg= wednesdayBike / 24;
+				thursAvg =  thursdayBike / 24;
+				friAvg = fridayBike / 24;
+				satAvg = saturdayBike / 24;
+				sunAvg = sundayBike / 24;
+	
+	    var data = new google.visualization.arrayToDataTable([
+        ['Day', 'Available Bikes'],
+        ['Mon', monAvg],
+        ['Tues', tuesAvg],
+        ['Wed', wedAvg],
+        ['Thu', thursAvg],
+        ['Fri', friAvg],
+        ['Sat', 9],
+        ['Sun', 10]
+    ]);
+	
+	
+	// Set display options for the chart
+        var options = {
+            title: 'Bike availability average per day',
+            width: 450,
+            height:400,
+            legend: { position: 'none' },
+            chart: { title: 'average per day'},
+            bars: 'vertical', 
+            axes: {
+                y: {
+                    0: { side: 'left', label: 'Average Number of Bikes Available'} // Top x-axis.
+                }
+            }
+        }
+
+        // Select the HTML div element to display the chart in, and draw it
+        var chart = new google.charts.Bar(document.getElementById('daily_chart'));
+        chart.draw(data, options);
+
+            }
+        
+	

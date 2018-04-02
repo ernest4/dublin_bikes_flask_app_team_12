@@ -1,18 +1,11 @@
-var station="";
-var infoBox = "";
 function initialize() {
-
     var mapOptions = {
         center:new google.maps.LatLng(53.3498,-6.2603),
         zoom:13,
         mapTypeId:google.maps.MapTypeId.ROADMAP,
         scrollwheel:false
     };
-
-
     var map=new google.maps.Map(document.getElementById("dublin_map"),mapOptions);
-
-
     var url="/jcdapi"
 
     // Station coordinates are retrieved from JSON  data
@@ -20,8 +13,15 @@ function initialize() {
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 data = JSON.parse(xmlhttp.responseText);
-				console.log(data);
+		
+				////////////// console.log  //////////////
+				//////////////////////////////////////////				
 
+	
+				//////////////////////////////////////////
+				
+				
+				
                 for (i=0;i<=data.length;i++) {
 
                     var colour;
@@ -50,12 +50,11 @@ function initialize() {
                         data[i].address + 
                         "</h2><span style=\"text-align:center;font-size:10px;color:black;\">Bikes: " + data[i].available_bikes + "</br>Docking Stations: " 
                         + data[i].available_bike_stands +
-						// "<br/><button onclick=\"on("+data[i].available_bikes+")\">... click for more detail...</button>"    
+						 "<br/><button onclick=\"on("+i+")\">... click for more detail...</button>"    
 					// passing an int works but not a string ??
-						 "<br/><button onclick=\"on(\'"+ data[i].address+ "\')\">... click for more detail...</button>"
+						// "<br/><button onclick=\"on(\'"+ data[i].address+ "\')\">... click for more detail...</button>"
 					
                     ;
-					console.log(data[i].address)
                    makeClickable(map, circle, infoBox);
                 }
             }
@@ -65,26 +64,46 @@ function initialize() {
 }
 
 
-	///////////////////////////////////
-	////////////// overlay ////////////
-	///////////////////////////////////
+	//////////////////////////////////////////
+	////////////// from analytics: ///////////
+	//////////////////////////////////////////
 
+// global variable (numbers for graphs)
+var weekly_data;
 
-function on(number) {
+function on(st_ID) {
     document.getElementById("overlay").style.display = "block";
-	document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + number;
+	document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + st_ID;
 	
-}
+	var path = '/weekly/' + st_ID;  // --> "/weekly/69"
+	    var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange=function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                
+                weekly_data = JSON.parse(xmlhttp.responseText);
+          		console.log(weekly_data);
+				// this function will generate the visuals
+                drawGraph();
+            }
+        }
+        xmlhttp.open("GET", path, true);
+        xmlhttp.send();
 
-function off() {
-    document.getElementById("overlay").style.display = "none";
+	
+	
 	// run query on database 
 	// select all from DB where num = num;
 	// getElementByID
 }
 
+function off() {
+    document.getElementById("overlay").style.display = "none";
+
+}
+
+
 	///////////////////////////////////
-	///////////////////////////////////
+	///////// Clickable Map ///////////
 	///////////////////////////////////
 
 
@@ -96,13 +115,9 @@ function makeClickable(map, circle, info) {
      });
    
      google.maps.event.addListener(circle, 'click', function(ev) {
-//	 var currentInfoWindow = null;
-//	   if (currentInfoWindow != null) {
-//		   currentInfoWindow.close();
-//	   }
+
        infowindow.setPosition(circle.getCenter());
        infowindow.open(map);
-	  // currentInfoWindow = infowindow;
      });
 }
 

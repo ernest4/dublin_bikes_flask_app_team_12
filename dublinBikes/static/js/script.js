@@ -168,28 +168,28 @@ function drawChart() {
         ['Wed', wedAvg],
         ['Thu', thursAvg],
         ['Fri', friAvg],
-        ['Sat', 9],
-        ['Sun', 10]
+        ['Sat', satAvg],
+        ['Sun', sunAvg]
     ]);
 	
 	
 	// Set display options for the chart
         var options = {
-            title: 'Bike availability average per day',
-            width: 450,
-            height:400,
+            title: 'aaaaaaaaa',
+            width: 800,
+            height:200,
             legend: { position: 'none' },
-            chart: { title: 'average per day'},
+            chart: { title: 'Avg Bikes per Day'},
             bars: 'vertical', 
             axes: {
                 y: {
-                    0: { side: 'left', label: 'Average Number of Bikes Available'} // Top x-axis.
+                    0: { side: 'left', label: 'Bikes'} // Top x-axis.
                 }
             }
         }
 
         // Select the HTML div element to display the chart in, and draw it
-        var chart = new google.charts.Bar(document.getElementById('daily_chart'));
+        var chart = new google.charts.Bar(document.getElementById('text'));
         chart.draw(data, options);
 
             }

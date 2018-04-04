@@ -10,6 +10,8 @@ from dublinBikes import myDatabase
 from datetime import datetime
 import json
 
+import sys
+
 #global vars
 justStarted = True #global var indicating if this the server has just started
 dynamicAPIlastScrape = ""
@@ -80,10 +82,18 @@ def scrapeJCDAPI():
 apiScarepThread = Thread(target=scrapeJCDAPI)
         
 def main():
-    #Create and start the JCD API scraper thread for static and dynamic data scraping
-    #apiScarepThread.start() #TURNED OFF WHEN TESTING LOCALLY, UNCOMMENT THIS WHEN PUSHING TO EC2 !!!!
-    
-    application.run(host='0.0.0.0', port=5000, use_reloader=False)
+    inputStr = input("Is this running on localhost [y/n]: ").lower()
+    if inputStr == "yes" or inputStr == "y": #Running on laptop/desktop
+        #Start the JCD API scraper thread for static and dynamic data scraping
+        apiScarepThread.start()
+        application.run(host='0.0.0.0', port=5000, use_reloader=False)
+    elif inputStr == "no" or inputStr == "n": #Running on EC2
+        #Start the JCD API scraper thread for static and dynamic data scraping
+        apiScarepThread.start()
+        application.run(host='0.0.0.0', port=80, use_reloader=False)
+    else:
+        print("Invalid input, exiting...")
+        sys.exit()
     
 
 if __name__ == '__main__':

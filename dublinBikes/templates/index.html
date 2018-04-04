@@ -8,22 +8,35 @@
         <script src="/static/js/jquery-3.2.0.min.js"></script>
         <script type="text/javascript" src="../static/js/script.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		
     </head>
+	
     <body>
+		
+<!--	overlay to contain charts + extra information    -->
+		
+		
+		<div id="overlay" onclick="off()">
+  			<div id="text">Overlay Text</div>
+			 <div id="daily_chart" style="float:left"></div>
+             <div id="weekly_chart" style="float:right"></div>
+		</div>
+<!--------------------------------------------------------->
+		
+		
         <header>
             <a href="/" id="logo">
                 <h1>( logo )Dublin Bikes</h1>
                 <h2>Real time tracker
 					<script src="../static/js/weather.js"></script>
 				</h2>
-
             </a>
             <nav>
 				<section class="container">
                 		<form class="search" method="post" action="/">
-							<input type="search" name="q" placeholder="bike station ..." 	autocomplete="off">
+							<input type="search" name="q" placeholder="..." 	autocomplete="on">
                   			<ul class="search-ac">
-								<li><a href="/">SMITHFIELD NORTH<br></a></li>
 								<li><a href="/">PARNELL SQUARE NORTH<br></a></li>
 								<li><a href="/">CLONMEL STREET<br></a></li>
 								<li><a href="/">MOUNT STREET LOWER</a></li>
@@ -41,7 +54,8 @@
                 <ul id="sections">
 
                     <li class="mapper">
-				<div class="weatherDiv" id="overlay">
+						
+				<div class="weatherDiv" id="overlay1"> 
 							<div id="icon">--</div>
 						<div id="currentWeather">--</div>
 						<div id="windspeed">--</div>

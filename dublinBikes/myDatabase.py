@@ -11,7 +11,7 @@ from sqlalchemy.ext.automap import automap_base
 import requests,json
 import sys
 import pandas as pd
-from datetime import datetime
+from datetime import datetime,timedelta
 
 #  mysql -h dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com -P 3306 -u Admin -p
 
@@ -271,10 +271,13 @@ def getOpenWeather():
         #print(e)
         sys.exit(e)
 #getOpenWeather()
+
+weatherBase = automap_base()
+weatherBase.prepare(engine,reflect=True)
+HWeather=weatherBase.classes.weather
+
 def populateCurrentWeather(weatherJson):
-    weatherBase = automap_base()
-    weatherBase.prepare(engine,reflect=True)
-    HWeather=weatherBase.classes.weather
+
     #for dt,datetime in session.query(HWeather.dt, HWeather.datetime):
     #    print("Testy:",dt,datetime)
     #print(type(weatherJson["dt"]))
@@ -286,10 +289,18 @@ def populateCurrentWeather(weatherJson):
                               icon= weatherJson['weather'][0]['icon'],
                               weather= True if weatherJson['weather'][0]['main'] in ['Clouds','Clear','Mist'] else False,
                               datetime = datetime.fromtimestamp(weatherJson["dt"]).strftime('%Y-%m-%d %H:%M:%S'))
+    #print(currentWeather.datetime)
+    #print(session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime)
+    #print(datetime.now() - session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime < timedelta(minutes=60))
+    #currentWeather.datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    #print(currentWeather.datetime)
+    if str(currentWeather.datetime) == str(session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime) and datetime.now() - session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime >= timedelta(minutes=60):
+        currentWeather.datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print("Open weather API fail to update within an hour, populating database with same data...")
     try:
-        session.add(currentWeather)
-        session.commit()
-        #session.close()
+            session.add(currentWeather)
+            session.commit()
+            #session.close()
     except:
         session.rollback()
     finally:
@@ -298,4 +309,8 @@ def populateCurrentWeather(weatherJson):
     print("populateWeatherTable: executed")
 
 #populateCurrentWeather(getOpenWeather())
+
+
+#t= session.query(HWeather).order_by(HWeather.datetime.desc()).first()
+#print(t.datetime)
 

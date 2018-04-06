@@ -9,6 +9,9 @@ import time
 from dublinBikes import myDatabase
 from datetime import datetime
 
+import sys
+from dublinBikes.myDatabase import getOpenWeather
+
 #global vars
 justStarted = True #global var indicating if this the server has just started
 dynamicAPIlastScrape = ""
@@ -50,11 +53,15 @@ def scrapeJCDAPI():
             staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
             print(staticAPIlastScrape)
             myDatabase.populateStaticTable(jcdAPIquery)
+            
         else: # Run about every 5 minutes...
             scrapeCount += 1
             dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
             print(dynamicAPIlastScrape)
             myDatabase.populateDynamicTable(jcdAPIquery)
+            if scrapeCount % 12 == 0: #Every Hour
+                myDatabase.populateCurrentWeather(getOpenWeather())
+            
             
         time.sleep(60*5) #Scrape about every 5 minutes...
             
@@ -62,10 +69,18 @@ def scrapeJCDAPI():
 apiScarepThread = Thread(target=scrapeJCDAPI)
         
 def main():
-    #Create and start the JCD API scraper thread for static and dynamic data scraping
-    apiScarepThread.start()
-    
-    application.run(host='0.0.0.0', port=5000, use_reloader=False)
+    inputStr = input("Is this running on localhost [y/n]: ").lower()
+    if inputStr == "yes" or inputStr == "y": #Running on laptop/desktop
+        #Start the JCD API scraper thread for static and dynamic data scraping
+        #apiScarepThread.start()
+        application.run(host='0.0.0.0', port=5000, use_reloader=False)
+    elif inputStr == "no" or inputStr == "n": #Running on EC2
+        #Start the JCD API scraper thread for static and dynamic data scraping
+        apiScarepThread.start()
+        application.run(host='0.0.0.0', port=80, use_reloader=False)
+    else:
+        print("Invalid input, exiting...")
+        sys.exit()
     
 
 if __name__ == '__main__':

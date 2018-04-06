@@ -1,4 +1,7 @@
-# Dublin Bikes [NOT FINALISED, MAY INCLUDE OUTDATED INFORMATION]
+# Dublin Bikes 
+# [NOT FINALISED, MAY INCLUDE OUTDATED INFORMATION]
+# [REPOSITORY IS PRIVATE TO PROTECT API KEY, ADD THE LECTUERE TO THIS REPO SO HE CAN VIEW IT !!!]
+# [DO NOT USE UCD WIRELESS, USE SOME OTHER NETWORK LIKE EDUROAM TO CONNECT!]
 
 Dublin Bikes description
 
@@ -7,8 +10,12 @@ Dublin Bikes description
 Run the application:
 
     comp30670_dublinBikes
-
-And open it in the browser at [http://34.217.37.227:5000/](http://34.217.37.227:5000/)
+    
+    When asked if you run locally answer yes if you're running on laptop or no if running EC2. 
+    (Different port numbers will be assigned in each case. 5000 for local, 80 for EC2.)
+    
+    Open it in the browser at (local)   http://localhost:5000/
+    Open it in the browser at (EC2)     http://35.162.27.252:80/
 
 
 ## Prerequisites

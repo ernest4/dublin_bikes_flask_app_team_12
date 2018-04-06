@@ -69,18 +69,9 @@ def scrapeJCDAPI():
 apiScarepThread = Thread(target=scrapeJCDAPI)
         
 def main():
-    inputStr = input("Is this running on localhost [y/n]: ").lower()
-    if inputStr == "yes" or inputStr == "y": #Running on laptop/desktop
-        #Start the JCD API scraper thread for static and dynamic data scraping
-        #apiScarepThread.start()
-        application.run(host='0.0.0.0', port=5000, use_reloader=False)
-    elif inputStr == "no" or inputStr == "n": #Running on EC2
-        #Start the JCD API scraper thread for static and dynamic data scraping
-        apiScarepThread.start()
-        application.run(host='0.0.0.0', port=80, use_reloader=False)
-    else:
-        print("Invalid input, exiting...")
-        sys.exit()
+    apiScarepThread.start()
+    #switch port to port=5000 when running locally
+    application.run(host='0.0.0.0', port=80, use_reloader=False)
     
 
 if __name__ == '__main__':

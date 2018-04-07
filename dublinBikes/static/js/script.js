@@ -121,6 +121,7 @@ function drawChart() {
 		var aBikes = [
 		[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20],[21],[22],[23]
 		];
+	// This loop populates the 2D list of times and average available bikes
 		for (i=0; i< weekly_data.length; i++){
 			for (j=0;j<24; j++){
 			if(weekly_data[i].Hour == j) 
@@ -137,11 +138,14 @@ function drawChart() {
 	
 	// Set display options for the chart
       var options = {
-          title: 'Weekly Occupancy Data (Number of Available Bikes)',
-          hAxis: {title: 'Hour',  titleTextStyle: {color: '#333'}},
-          vAxis: {minValue: 0},
+          title: 'Average Available Bikes',
+          hAxis: {title: 'Hour',  titleTextStyle: {color: '#333'},
+				  // 'tick' values are the numerical values that are displayed on the x and y axis
+				  ticks:[0,2,4,6,8,10,12,14,16,18,20,22,24]},
+          vAxis: {title: 'Bikes',minValue: 0, maxValue:140,
+				 	ticks: [0,20,40,60,80,100,120,140,160]},
           isStacked: "true",
-		  width :800,
+		  width :1000,
           height:400
         };
 	

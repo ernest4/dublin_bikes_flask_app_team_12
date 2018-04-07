@@ -33,13 +33,13 @@ def jcdAPItoFrontEnd():
 def weeklyJSONtoFrontEnd(stationNumber):
     queryResult = myDatabase.weeklyAvailableBikes(stationNumber)
     #print(json.dumps(queryResult))
-    
+
     #preparing JSON for front end
     #for dictionary in queryResult:
     #    for key in dictionary:
     #        if key == "Hour":
     #            print(dictionary[key])
-        
+
     return application.response_class(response=json.dumps(queryResult), status=200, mimetype='application/json')
 
 @application.route("/testplot")
@@ -59,11 +59,11 @@ def scrapeJCDAPI():
     global justStarted
     global staticAPIlastScrape
     global dynamicAPIlastScrape
-    
+
     scrapeCount = 0
-    
+
     while True: #Run for as long as the server is active...
-        
+
         jcdAPIquery = myDatabase.getJCD()
         if scrapeCount == 288 or justStarted == True: # Run when server launches. Then about every 24h...
             justStarted = False
@@ -71,7 +71,7 @@ def scrapeJCDAPI():
             staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
             print(staticAPIlastScrape)
             myDatabase.populateStaticTable(jcdAPIquery)
-            
+
         else: # Run about every 5 minutes...
             scrapeCount += 1
             dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
@@ -79,28 +79,24 @@ def scrapeJCDAPI():
             myDatabase.populateDynamicTable(jcdAPIquery)
             if scrapeCount % 12 == 0: #Every Hour
                 myDatabase.populateCurrentWeather(getOpenWeather())
-            
-            
+
+
         time.sleep(60*5) #Scrape about every 5 minutes...
-            
-            
+
+
 apiScarepThread = Thread(target=scrapeJCDAPI)
-        
+
 def main():
-<<<<<<< HEAD
+
     #Create and start the JCD API scraper thread for static and dynamic data scraping
     #apiScarepThread.start() #TURNED OFF WHEN TESTING LOCALLY, UNCOMMENT THIS WHEN PUSHING TO EC2 !!!!
-    
-=======
+
+
     apiScarepThread.start()
     #switch port to port=5000 when running locally
->>>>>>> f876f667e9a451c35e7f1e31fd812e72af8c216c
+
     application.run(host='0.0.0.0', port=5000, use_reloader=False)
-    
+
 
 if __name__ == '__main__':
     main()
-    
-    
-    
-    

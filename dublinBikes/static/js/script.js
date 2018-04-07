@@ -141,8 +141,8 @@ function drawChart() {
           hAxis: {title: 'Hour',  titleTextStyle: {color: '#333'}},
           vAxis: {minValue: 0},
           isStacked: "true",
-		  width :600,
-          height:200
+		  width :800,
+          height:400
         };
 	
 	    var chart = new google.visualization.AreaChart(document.getElementById('text'));

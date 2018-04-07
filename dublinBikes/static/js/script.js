@@ -1,6 +1,7 @@
 // B
 var station="";
 var infoBox = "";
+var markers = [];
 function initialize() {
     var mapOptions = {
         center:new google.maps.LatLng(53.3498,-6.2603),
@@ -90,21 +91,26 @@ function off() {
 	///////////////////////////////////
 	///////////////////////////////////
 
-
+var infowindow;
 function makeClickable(map, circle, info) {
 
-     var infowindow = new google.maps.InfoWindow({
+     infowindow = new google.maps.InfoWindow({
          content: info
      });
      google.maps.event.addListener(circle, 'click', function(ev) {
+		if (markers.length > 0) {
+			hideAllInfoWindows(map);
+		};
+	   
        infowindow.setPosition(circle.getCenter());
        infowindow.open(map);
      });
+	markers.push(circle);
 }
 
-function hideAllMarkers(map) {
-	circle.forEach(function(circle){
-		circle.infowindow.close(map,circle);
+function hideAllInfoWindows(map) {
+	markers.forEach(function(circle){
+		infowindow.close(map,circle);
 				   });
 }
 

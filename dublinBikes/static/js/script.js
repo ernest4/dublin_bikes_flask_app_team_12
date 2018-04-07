@@ -32,9 +32,9 @@ function initialize() {
                         strokeOpacity: '0.8',
                         strokeWeight: 2,
                         fillColor: colour,
-                        fillOpacity: 0.25,
+                        fillOpacity: 1,
                         map: map,
-                        radius: 75,
+                        radius: 100,
                         clickable:true,
                         center: {lat: data[i].position.lat, lng: data[i].position.lng},
                     });

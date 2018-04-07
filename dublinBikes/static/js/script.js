@@ -98,11 +98,10 @@ function makeClickable(map, circle, info) {
          content: info
      });
      google.maps.event.addListener(circle, 'click', function(ev) {
-		if (markers.length > 0) {
-			hideAllInfoWindows(map);
-		};
-	   
+		
+		hideAllInfoWindows(map);
        infowindow.setPosition(circle.getCenter());
+	   map.panTo(circle.getCenter());
        infowindow.open(map);
      });
 	markers.push(circle);

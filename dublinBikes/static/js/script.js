@@ -141,7 +141,7 @@ function drawChart() {
           title: 'Average Available Bikes',
           hAxis: {title: 'Hour',  titleTextStyle: {color: '#333'},
 				  // 'tick' values are the numerical values that are displayed on the x and y axis
-				  ticks:[0,2,4,6,8,10,12,14,16,18,20,22,24]},
+				  ticks:[1,3,5,7,9,11,13,15,17,19,21,23]},
           vAxis: {title: 'Bikes',minValue: 0, maxValue:140,
 				 	ticks: [0,20,40,60,80,100,120,140,160]},
           isStacked: "true",

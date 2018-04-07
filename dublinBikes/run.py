@@ -10,6 +10,9 @@ from dublinBikes import myDatabase
 from datetime import datetime
 import json
 
+import sys
+from dublinBikes.myDatabase import getOpenWeather
+
 #global vars
 justStarted = True #global var indicating if this the server has just started
 dynamicAPIlastScrape = ""
@@ -68,11 +71,15 @@ def scrapeJCDAPI():
             staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
             print(staticAPIlastScrape)
             myDatabase.populateStaticTable(jcdAPIquery)
+            
         else: # Run about every 5 minutes...
             scrapeCount += 1
             dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
             print(dynamicAPIlastScrape)
             myDatabase.populateDynamicTable(jcdAPIquery)
+            if scrapeCount % 12 == 0: #Every Hour
+                myDatabase.populateCurrentWeather(getOpenWeather())
+            
             
         time.sleep(60*5) #Scrape about every 5 minutes...
             
@@ -80,9 +87,14 @@ def scrapeJCDAPI():
 apiScarepThread = Thread(target=scrapeJCDAPI)
         
 def main():
+<<<<<<< HEAD
     #Create and start the JCD API scraper thread for static and dynamic data scraping
     #apiScarepThread.start() #TURNED OFF WHEN TESTING LOCALLY, UNCOMMENT THIS WHEN PUSHING TO EC2 !!!!
     
+=======
+    apiScarepThread.start()
+    #switch port to port=5000 when running locally
+>>>>>>> f876f667e9a451c35e7f1e31fd812e72af8c216c
     application.run(host='0.0.0.0', port=5000, use_reloader=False)
     
 

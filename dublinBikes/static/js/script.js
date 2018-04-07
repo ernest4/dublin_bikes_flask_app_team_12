@@ -38,18 +38,12 @@ function initialize() {
                         clickable:true,
                         center: {lat: data[i].position.lat, lng: data[i].position.lng},
                     });
-
                     infoBox =
-                        "<h3 id=\"st_add\" style=\"margin:2px;\">" + 
-                        data[i].address + 
-                        "</h2><span style=\"text-align:center;font-size:10px;color:black;\">Bikes: " + data[i].available_bikes + "</br>Docking Stations: " 
-                        + data[i].available_bike_stands +
-						// "<br/><button onclick=\"on("+data[i].available_bikes+")\">... click for more detail...</button>"    
-					// passing an int works but not a string ??
-						 "<br/><button onclick=\"on(\'"+ i+ "\')\">... click for more detail...</button>"
-					
+                        "<h3 id=\"st_add\" style=\"margin:2px;color:black;font-size:16px;text-align: center;\">" + 
+                        data[i].address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +data[i].available_bikes +"&ensp;&ensp;|&ensp;&ensp;"+data[i].available_bike_stands +
+						"</br> bikes&emsp;stands</div> " +
+						 "<br/>wet: <button class=btn onclick=\"on(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;week:<button class=btn onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>"
                     ;
-				
                    makeClickable(map, circle, infoBox);
                 }
             }
@@ -57,8 +51,6 @@ function initialize() {
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
 }
-
-
 	///////////////////////////////////
 	////////////// overlay ////////////
 	///////////////////////////////////

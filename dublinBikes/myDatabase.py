@@ -4,35 +4,55 @@ Created on 16 Mar 2018
 @author: naomiwang
 '''
 
-from sqlalchemy import create_engine, Column,Integer,String,Boolean,Float,ForeignKey,text
+from sqlalchemy import create_engine, Column,Integer,String,Boolean,Float,ForeignKey,DateTime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.automap import automap_base
 import requests,json
+import sys
+import pandas as pd
+from datetime import datetime,timedelta
 
 #  mysql -h dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com -P 3306 -u Admin -p
 
 #Test Json file, comment out when using real API
-global request
+#global request
 #with open('../tests/stations0.json', 'rb') as f:
     #print("reading the file")
-#   request = f.read()
+ #   request = f.read()
     #print("Finished.")
 # End here
 
 # Activate this line if pass test
 def getJCD():
-    request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content.decode('utf-8')
-    
-    stationsJson = json.loads(request)
+    try:
+        request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content.decode('utf-8')
+        try:
+            stationsJson = json.loads(request)
     #print(stationsJson[0])
-    for i,item in enumerate(stationsJson):
-        #print(stationsJson[i])
-        if stationsJson[i]["last_update"] != None:
-            stationsJson[i]["last_update"]//=1000
-        else:
-            pass
+    
+            for item in stationsJson:
+                #print(stationsJson[i])
+                if item["last_update"] != None:
+                    item["last_update"]//=1000
+                    #stationsJson[i]["last_update"] = datetime.datetime.fromtimestamp(stationsJson[i]["last_update"])
+                    #print("datetime:",stationsJson[i]["last_update"])
+                    # Just in case I want to use weekday later:
+                    #datetime.fromtimestamp(ep/1000).strftime("%A")
+                else:
+                    pass
+            return stationsJson
         
-    return stationsJson
+        except ValueError as e:
+            print(e)
+            sys.exit(1)
+    
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        print(e)
+        sys.exit(1)
+    
+    
+    
 #print(stationsJson[0]["last_update"])
 #print(stationsJson[0]["banking"])
 #for station in stationsJson:
@@ -73,10 +93,11 @@ class Station(Base):
 
                 
 class Dynamic(Base):
+    #! Mind here the table name
     __tablename__ = 'Dynamic'
     
     stationID = Column(Integer,ForeignKey('Station.id'),primary_key=True)
-    timeStamp = Column(Integer(),primary_key=True)
+    timeStamp = Column(Integer,primary_key=True)
     status = Column(String(100))
     bikeStands = Column(Integer)
     availableBikeStands = Column(Integer)
@@ -140,7 +161,7 @@ def populateDynamicTable(stationsJson):
             session.close()
             
     print("populateDynamicTable: executed")
-#populateDynamicTable()
+
 
 #def newest(station=None):
 #   if station == None:
@@ -160,7 +181,7 @@ def query():
     '''
     #q=session.query(Station,Dynamic).from_statement(text(statement1)).all()
     q=engine.execute(statement)
-    
+
     preJSON = [dict(r) for r in q]
     for r in preJSON:
         r['number'] = r.pop('id')
@@ -176,8 +197,8 @@ def query():
     return json.dumps(preJSON)
     '''
     result=[]
-    for row in q:
-        result.append(row)
+    for weatherJson in q:
+        result.append(weatherJson)
     print(result)
     j=[]
     for id,name,address,lat,lng,banking,bonus,timeStamp,status,bikeStands, availableBikeStands, availableBikes in result:
@@ -186,4 +207,112 @@ def query():
     '''
     
 #query()
+
+def weeklyAvailableBikes(stationID):
+    query='''
+    select hour(from_unixtime(timeStamp)) as Hour, dayofweek(from_unixtime(timeStamp)) as Weekday,
+     avg(availableBikes ) as avgAvailableBikes 
+     from Dynamic where stationID='''+str(stationID)+'''
+     group by hour(from_unixtime(timeStamp)), dayofweek(from_unixtime(timeStamp))'''
+
+    q=engine.execute(query)
     
+    preJSON = [dict(r) for r in q]
+    for r in preJSON:
+        r['avgAvailableBikes'] = float(r['avgAvailableBikes']) #converts Decimal() type to pure float type
+    #print(l)
+    #l[0]['avgAvailableBikes']
+    return preJSON
+#weeklyAvailableBikes(42)
+
+#==================================weather=============
+'''
+#-------populate history data---only need run once-----------------------
+df = pd.read_csv('../tests/dublin_weather.csv')
+df['datetime'] = pd.to_datetime(df['dt'], unit='s')
+
+#weather means good wather or bad weather. True == Good weather, False== bad weather
+df['weather.main'] = df['weather.main'].replace(['Clouds','Clear','Mist'],value=True)
+df['weather.main'] = df['weather.main'].replace(['Drizzle','Fog','Rain','Snow'], value=False)
+df['main.temp'] = df['main.temp']-273.15
+df = df.drop(['city_id','clouds.all','dt_iso','main.pressure','main.temp_max','main.temp_min','rain.1h','rain.24h','rain.3h','wind.deg','wind.speed','weather.id'],axis=1)
+df = df.drop_duplicates()
+#print(df)
+df.columns = ['dt','humidity','temp','description','icon','weather','datetime']
+print(df.dtypes)
+#print(df[df['dt'] == 1522627200])
+
+def populateHistoryWeather(df):
+    try:
+        df.to_sql(name='weather', con=engine, if_exists = 'fail', index=False)
+    except ValueError:
+        pass
+    engine.execute('alter table weather add primary key(datetime)')
+
+#populateHistoryWeather(df)
+#-------populate history data---only need run once above-----------------------
+'''
+def getOpenWeather():
+    try:
+        request = requests.get('http://openweathermap.org/data/2.5/weather?q=dublin&appid=b6907d289e10d714a6e88b30761fae22').content.decode('utf-8')
+        try:
+            currentWeatherJson = json.loads(request)
+    #print(stationsJson[0])
+    
+            if currentWeatherJson != None:
+                #print(currentWeatherJson)
+                return currentWeatherJson
+            else:
+                print('[Error 0] The weather json is empty.')
+        
+        except ValueError as e:
+            #print(e)
+            sys.exit(e)
+    
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        #print(e)
+        sys.exit(e)
+#getOpenWeather()
+
+weatherBase = automap_base()
+weatherBase.prepare(engine,reflect=True)
+HWeather=weatherBase.classes.weather
+
+def populateCurrentWeather(weatherJson):
+
+    #for dt,datetime in session.query(HWeather.dt, HWeather.datetime):
+    #    print("Testy:",dt,datetime)
+    #print(type(weatherJson["dt"]))
+            
+    currentWeather = HWeather(dt=weatherJson["dt"],
+                              humidity=weatherJson["main"]["humidity"],
+                              temp=weatherJson['main']['temp'],
+                              description=weatherJson['weather'][0]['description'],
+                              icon= weatherJson['weather'][0]['icon'],
+                              weather= True if weatherJson['weather'][0]['main'] in ['Clouds','Clear','Mist'] else False,
+                              datetime = datetime.fromtimestamp(weatherJson["dt"]).strftime('%Y-%m-%d %H:%M:%S'))
+    #print(currentWeather.datetime)
+    #print(session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime)
+    #print(datetime.now() - session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime < timedelta(minutes=60))
+    #currentWeather.datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    #print(currentWeather.datetime)
+    if str(currentWeather.datetime) == str(session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime) and datetime.now() - session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime >= timedelta(minutes=60):
+        currentWeather.datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print("Open weather API fail to update within an hour, populating database with same data...")
+    try:
+            session.add(currentWeather)
+            session.commit()
+            #session.close()
+    except:
+        session.rollback()
+    finally:
+        session.close()
+            
+    print("populateWeatherTable: executed")
+
+#populateCurrentWeather(getOpenWeather())
+
+
+#t= session.query(HWeather).order_by(HWeather.datetime.desc()).first()
+#print(t.datetime)
+

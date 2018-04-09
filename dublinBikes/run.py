@@ -10,7 +10,6 @@ from dublinBikes import myDatabase
 from datetime import datetime
 import json
 
-import sys
 from dublinBikes.myDatabase import getOpenWeather
 
 #global vars

@@ -15,18 +15,7 @@ function initialize() {
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 data = JSON.parse(xmlhttp.responseText);
-
-				////////////// console.log  //////////////
-				//////////////////////////////////////////				
-
-
-	
-				//////////////////////////////////////////
-				
-				
-				
                 for (i=0;i<=data.length;i++) {
-
                     var colour;
                     if (data[i].available_bikes/data[i].bike_stands < 0.2) {
                         colour = 'red';
@@ -48,21 +37,10 @@ function initialize() {
                         center: {lat: data[i].position.lat, lng: data[i].position.lng},
                     });
                     infoBox =
-
-//                        "<h3 id=\"st_add\" style=\"margin:2px;\">" + 
-//                        data[i].address + 
-//                        "</h2><span style=\"text-align:center;font-size:10px;color:black;\">Bikes: " + data[i].available_bikes + "</br>Docking Stations: " 
-//                        + data[i].available_bike_stands +
-//						 "<br/><button onclick=\"on("+i+")\">... click for more detail...</button>"    
-//					// passing an int works but not a string ??
-//						// "<br/><button onclick=\"on(\'"+ data[i].address+ "\')\">... click for more detail...</button>"
-//					
-
                         "<h3 id=\"st_add\" style=\"margin:2px;color:black;font-size:16px;text-align: center;\">" +
                         data[i].address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +data[i].available_bikes +"&ensp;&ensp;|&ensp;&ensp;"+data[i].available_bike_stands +
 						"</br> bikes&emsp;stands</div> " +
 						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>"
-
                     ;
                    makeClickable(map, circle, infoBox);
                 }
@@ -71,59 +49,29 @@ function initialize() {
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
 }
-
-
-
-	//////////////////////////////////////////
-	////////////// from analytics: ///////////
-	//////////////////////////////////////////
-
-// global variable (numbers for graphs)
-
-	///////////////////////////////////
-	////////////// overlay ////////////
-	///////////////////////////////////
-
-
 var weekly_data;
-
 function on(st_ID) {
     document.getElementById("overlay").style.display = "block";
-	document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + st_ID;
-	
-	var path = '/weekly/' + st_ID;  // --> "/weekly/69"
+//	document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + st_ID;
+	var path = '/weekly/' + st_ID;
 	    var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                
                 weekly_data = JSON.parse(xmlhttp.responseText);
-          		console.log(weekly_data);
-				// this function will generate the visuals
                 drawGraph();
             }
         }
         xmlhttp.open("GET", path, true);
         xmlhttp.send();
-
-	
-	
-	// run query on database 
-	// select all from DB where num = num;
-	// getElementByID
-	//document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + st_ID;
-
 	var path = '/weekly/'+st_ID;
 	google.charts.load('current', {'packages':['corechart']});
-
-	//google.charts.setOnLoadCallback();
 	var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange=function() {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
+        xmlhttp.onreadystatechange=function() 
+		{
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) 
+			{
                 weekly_data = JSON.parse(xmlhttp.responseText);
 				google.charts.setOnLoadCallback(drawChart);
-
-
 			}
 		}
         xmlhttp.open("GET", path, true);
@@ -191,7 +139,6 @@ function drawChart() {
       var options = {
           title: 'Average Available Bikes',
           hAxis: {title: 'Hour',  titleTextStyle: {color: '#333'},
-				  // 'tick' values are the numerical values that are displayed on the x and y axis
 				  ticks:[1,3,5,7,9,11,13,15,17,19,21,23]},
           vAxis: {title: 'Bikes',minValue: 0, maxValue:40,
 				 	ticks: [0,5,10,15,20,25,30,35,40]},
@@ -200,8 +147,6 @@ function drawChart() {
 		  width :1000,
           height:400
         };
-
 	    var chart = new google.visualization.AreaChart(document.getElementById('text'));
         chart.draw(data, options);
-
-            }
+         }

@@ -28,27 +28,22 @@ from unittest.mock import inplace
 def getJCD():
     try:
         request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content.decode('utf-8')
-        try:
-            stationsJson = json.loads(request)
-    #print(stationsJson[0])
+        stationsJson = json.loads(request)
+        #print(stationsJson[0])
+
+        for item in stationsJson:
+            #print(stationsJson[i])
+            if item["last_update"] != None:
+                item["last_update"]//=1000
+                #stationsJson[i]["last_update"] = datetime.datetime.fromtimestamp(stationsJson[i]["last_update"])
+                #print("datetime:",stationsJson[i]["last_update"])
+                # Just in case I want to use weekday later:
+                #datetime.fromtimestamp(ep/1000).strftime("%A")
+            else:
+                pass
+        return stationsJson
     
-            for item in stationsJson:
-                #print(stationsJson[i])
-                if item["last_update"] != None:
-                    item["last_update"]//=1000
-                    #stationsJson[i]["last_update"] = datetime.datetime.fromtimestamp(stationsJson[i]["last_update"])
-                    #print("datetime:",stationsJson[i]["last_update"])
-                    # Just in case I want to use weekday later:
-                    #datetime.fromtimestamp(ep/1000).strftime("%A")
-                else:
-                    pass
-            return stationsJson
-        
-        except ValueError as e:
-            print(e)
-            sys.exit(1)
-    
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
+    except (ValueError, requests.exceptions.RequestException) as e:
         print(e)
         sys.exit(1)
     
@@ -218,10 +213,12 @@ def weeklyAvailableBikes(stationID):
 
     q=engine.execute(query)
     
-    l = [dict(r) for r in q]
+    preJSON = [dict(r) for r in q]
+    for r in preJSON:
+        r['avgAvailableBikes'] = float(r['avgAvailableBikes']) #converts Decimal() type to pure float type
     #print(l)
     #l[0]['avgAvailableBikes']
-    return l
+    return preJSON
 #weeklyAvailableBikes(42)
 
 #==================================weather=============
@@ -254,23 +251,19 @@ def populateHistoryWeather(df):
 def getOpenWeather():
     try:
         request = requests.get('http://openweathermap.org/data/2.5/weather?q=dublin&appid=b6907d289e10d714a6e88b30761fae22').content.decode('utf-8')
-        try:
-            currentWeatherJson = json.loads(request)
-    #print(stationsJson[0])
+        currentWeatherJson = json.loads(request)
+        #print(stationsJson[0])
+
+        if currentWeatherJson != None:
+            #print(currentWeatherJson)
+            return currentWeatherJson
+        else:
+            print('[Error 0] The weather json is empty.')
     
-            if currentWeatherJson != None:
-                #print(currentWeatherJson)
-                return currentWeatherJson
-            else:
-                print('[Error 0] The weather json is empty.')
-        
-        except ValueError as e:
-            #print(e)
-            sys.exit(e)
-    
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
+    except (ValueError, requests.exceptions.RequestException) as e:
         #print(e)
         sys.exit(e)
+        
 #getOpenWeather()
 
 weatherBase = automap_base()

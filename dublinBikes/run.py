@@ -71,7 +71,7 @@ apiScarepThread = Thread(target=scrapeJCDAPI)
 def main():
     apiScarepThread.start()
     #switch port to port=5000 when running locally
-    application.run(host='0.0.0.0', port=80, use_reloader=False)
+    application.run(host='0.0.0.0', port=5000, use_reloader=False)
     
 
 if __name__ == '__main__':

@@ -316,7 +316,7 @@ def populateCurrentWeather(weatherJson):
 #------------Combine weather with bike-------------
 
 
-def bikeWeather(stationID):
+def getBikeWeather(stationID):
     weatherQuery = '''select * from weather'''
     df_weather = pd.read_sql_query(weatherQuery,engine)
     #print(df_weather)
@@ -338,8 +338,9 @@ def bikeWeather(stationID):
     result = pd.concat([df_weather.set_index('Hourly'), df_bike_resamp], axis=1, join='inner')
     result = result.drop(['datetime','dt'],axis=1)
     #print(result)
-    print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
+    #print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
+    return result
     
-bikeWeather(42)
+#getBikeWeather(42)
     
 

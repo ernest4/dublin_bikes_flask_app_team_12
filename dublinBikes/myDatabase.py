@@ -12,6 +12,7 @@ import requests,json
 import sys
 import pandas as pd
 from datetime import datetime,timedelta
+from unittest.mock import inplace
 
 #  mysql -h dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com -P 3306 -u Admin -p
 
@@ -293,14 +294,19 @@ def populateCurrentWeather(weatherJson):
     #print(session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime)
     #print(datetime.now() - session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime < timedelta(minutes=60))
     #currentWeather.datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    #print(currentWeather.datetime)
+    #print(str(currentWeather.datetime) == str(session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime))
+    #print(datetime.now() - session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime >= timedelta(minutes=60))
+    #print(datetime.now() - session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime)
+    #print(timedelta(minutes=60))
+    #currentWeather.datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if str(currentWeather.datetime) == str(session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime) and datetime.now() - session.query(HWeather).order_by(HWeather.datetime.desc()).first().datetime >= timedelta(minutes=60):
         currentWeather.datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print("Open weather API fail to update within an hour, populating database with same data...")
     try:
-            session.add(currentWeather)
-            session.commit()
-            #session.close()
+        #print(currentWeather.datetime)
+        session.add(currentWeather)
+        session.commit()
+        #session.close()
     except:
         session.rollback()
     finally:
@@ -313,4 +319,34 @@ def populateCurrentWeather(weatherJson):
 
 #t= session.query(HWeather).order_by(HWeather.datetime.desc()).first()
 #print(t.datetime)
+
+#------------Combine weather with bike-------------
+
+
+def bikeWeather(stationID):
+    weatherQuery = '''select * from weather'''
+    df_weather = pd.read_sql_query(weatherQuery,engine)
+    #print(df_weather)
+    bikeQuery = ''' select * from Dynamic where stationID = '''+ str(stationID)
+    df_bike = pd.read_sql_query(bikeQuery,engine)
+    
+    #df_weather['dayOfYear'] = df_weather['datetime'].dt.hour
+    #print(df_weather['datetime']) 
+    df_weather['Hourly'] = df_weather['datetime'].dt.floor('h')
+#    print(df_weather['Hourly'])
+    #print(df_weather)
+    
+    df_bike['Hourly'] = pd.to_datetime(df_bike['timeStamp'],unit='s').dt.floor('h')
+    df_bike.set_index('Hourly',inplace=True)
+    #print(df_bike['Hourly'])
+    #print(df_bike)
+    df_bike_resamp = df_bike['availableBikes'].resample('H').mean()
+    #print(df_bike_resamp) 
+    result = pd.concat([df_weather.set_index('Hourly'), df_bike_resamp], axis=1, join='inner')
+    result = result.drop(['datetime','dt'],axis=1)
+    #print(result)
+    print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
+    
+bikeWeather(42)
+    
 

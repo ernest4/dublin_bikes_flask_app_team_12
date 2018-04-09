@@ -28,7 +28,7 @@ function initialize() {
                 for (i=0;i<=data.length;i++) {
 
                     var colour;
-                    if (data[i].available_bikes/data[i].bike_stands == 0) {
+                    if (data[i].available_bikes/data[i].bike_stands < 0.2) {
                         colour = 'red';
                     }else if (0.2 <= data[i].available_bikes/data[i].bike_stands && data[i].available_bikes/data[i].bike_stands <= 0.8) {
                         colour = 'orange';

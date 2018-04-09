@@ -193,9 +193,10 @@ function drawChart() {
           hAxis: {title: 'Hour',  titleTextStyle: {color: '#333'},
 				  // 'tick' values are the numerical values that are displayed on the x and y axis
 				  ticks:[1,3,5,7,9,11,13,15,17,19,21,23]},
-          vAxis: {title: 'Bikes',minValue: 0, maxValue:140,
-				 	ticks: [0,20,40,60,80,100,120,140,160]},
+          vAxis: {title: 'Bikes',minValue: 0, maxValue:40,
+				 	ticks: [0,5,10,15,20,25,30,35,40]},
           isStacked: "true",
+		 // backgroundColor: { fill:'transparent' },
 		  width :1000,
           height:400
         };

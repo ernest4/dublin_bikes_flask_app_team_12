@@ -1,16 +1,19 @@
 import unittest
-
-import dublinBikes
+from dublinBikes.run import application
 
 
 class DublinbikesTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.app = dublinBikes.application.test_client()
+        self.app = application.test_client()
 
     def test_index(self):
         rv = self.app.get('/')
-        self.assertIn('Welcome to Dublin Bikes', rv.data.decode())
+        contents = ""
+        with open("dublinBikes/templates/index.html", "r") as file:
+            contents += file.readline()
+            
+        self.assertIn(contents, rv.data.decode())
 
 
 if __name__ == '__main__':

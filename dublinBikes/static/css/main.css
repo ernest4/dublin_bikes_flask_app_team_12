@@ -190,6 +190,36 @@ nav {
 }
 
 /*************************
+       ! BUTTON!
+**************************/
+
+.btn {
+  background: #f9fbfc;
+  background-image: -webkit-linear-gradient(top, #f9fbfc, #e1e8ed);
+  background-image: -moz-linear-gradient(top, #f9fbfc, #e1e8ed);
+  background-image: -ms-linear-gradient(top, #f9fbfc, #e1e8ed);
+  background-image: -o-linear-gradient(top, #f9fbfc, #e1e8ed);
+  background-image: linear-gradient(to bottom, #f9fbfc, #e1e8ed);
+  -webkit-border-radius: 28;
+  -moz-border-radius: 28;
+  border-radius: 28px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 20px;
+  padding: 2.5px 5px 2.5px 5px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #d2d8db;
+  background-image: -webkit-linear-gradient(top, #d2d8db, #c8cacc);
+  background-image: -moz-linear-gradient(top, #d2d8db, #c8cacc);
+  background-image: -ms-linear-gradient(top, #d2d8db, #c8cacc);
+  background-image: -o-linear-gradient(top, #d2d8db, #c8cacc);
+  background-image: linear-gradient(to bottom, #d2d8db, #c8cacc);
+  text-decoration: none;
+}
+/*************************
         ! SEARCH !
 **************************/
 input {

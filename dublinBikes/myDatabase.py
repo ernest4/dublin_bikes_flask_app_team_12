@@ -336,7 +336,7 @@ def getBikeWeather(stationID):
     df_bike_resamp = df_bike['availableBikes'].resample('H').mean()
     #print(df_bike_resamp) 
     result = pd.concat([df_weather.set_index('Hourly'), df_bike_resamp], axis=1, join='inner')
-    result = result.drop(['datetime','dt'],axis=1)
+    result = result.drop(['dt'],axis=1)
     #print(result)
     #print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
     return result

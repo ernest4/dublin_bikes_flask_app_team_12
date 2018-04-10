@@ -17,9 +17,10 @@ function initialize() {
                 data = JSON.parse(xmlhttp.responseText);
                 for (i=0;i<=data.length;i++) {
                     var colour;
-                    if (data[i].available_bikes/data[i].bike_stands < 0.2) {
+			// red should reflect the absence of any bikes at a specific bike station
+                    if (data[i].available_bikes/data[i].bike_stands == 0) {
                         colour = 'red';
-                    }else if (0.2 <= data[i].available_bikes/data[i].bike_stands && data[i].available_bikes/data[i].bike_stands <= 0.8) {
+                    }else if (0 < data[i].available_bikes/data[i].bike_stands && data[i].available_bikes/data[i].bike_stands <= 0.8) {
                         colour = 'orange';
                     } else {
                         colour = 'green';
@@ -52,7 +53,6 @@ function initialize() {
 var weekly_data;
 function on(st_ID) {
     document.getElementById("overlay").style.display = "block";
-//	document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + st_ID;
 	var path = '/weekly/' + st_ID;
 	    var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange=function() {
@@ -76,17 +76,10 @@ function on(st_ID) {
 		}
         xmlhttp.open("GET", path, true);
         xmlhttp.send();
-
 }
-
-
 function off() {
     document.getElementById("overlay").style.display = "none";
-
-
 }
-
-
 
 	///////////////////////////////////
 	///////// Clickable Map ///////////
@@ -94,13 +87,10 @@ function off() {
 
 var infowindow;
 function makeClickable(map, circle, info) {
-
      infowindow = new google.maps.InfoWindow({
          content: info
      });
      google.maps.event.addListener(circle, 'click', function(ev) {
-
-		
 		hideAllInfoWindows(map);
        infowindow.setPosition(circle.getCenter());
 	   map.panTo(circle.getCenter());
@@ -115,12 +105,11 @@ function hideAllInfoWindows(map) {
 				   });
 }
 
-////////////////////// draw stuff /////////////////////////////
-function drawChart() {
+function drawChart()
+{
 		var aBikes = [
 		[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20],[21],[22],[23]
 		];
-	// This loop populates the 2D list of times and average available bikes
 		for (i=0; i< weekly_data.length; i++){
 			for (j=0;j<24; j++){
 			if(weekly_data[i].Hour == j)
@@ -133,10 +122,9 @@ function drawChart() {
 		aBikes[8],aBikes[9],aBikes[10],aBikes[11],aBikes[12],aBikes[13],aBikes[14],aBikes[15],
 		aBikes[16],aBikes[17],aBikes[18],aBikes[19],aBikes[20],aBikes[21],aBikes[22],aBikes[23]
     ]);
-
-
 	// Set display options for the chart
-      var options = {
+      var options = 
+		  {
           title: 'Average Available Bikes',
           hAxis: {title: 'Hour',  titleTextStyle: {color: '#333'},
 				  ticks:[1,3,5,7,9,11,13,15,17,19,21,23]},
@@ -149,4 +137,4 @@ function drawChart() {
         };
 	    var chart = new google.visualization.AreaChart(document.getElementById('text'));
         chart.draw(data, options);
-         }
+}

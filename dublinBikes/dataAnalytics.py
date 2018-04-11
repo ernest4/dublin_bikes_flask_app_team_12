@@ -11,4 +11,4 @@ bikeWeather = myDatabase.getBikeWeather(42) #testing
 
 print(bikeWeather)
 
-#print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
+#print(list(zip(map(lambda x:x.isoformat(), bikeWeather.index ), bikeWeather .values)))

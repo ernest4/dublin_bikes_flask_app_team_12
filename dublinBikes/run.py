@@ -89,7 +89,7 @@ apiScarepThread = Thread(target=scrapeJCDAPI)
 def main():
     #Create and start the JCD API scraper thread for static and dynamic data scraping
     #TURNED OFF WHEN TESTING LOCALLY, UNCOMMENT THIS WHEN PUSHING TO EC2 !!!!
-    #apiScarepThread.start()
+    apiScarepThread.start()
     
     #switch port to port=5000 when running locally
     application.run(host='0.0.0.0', port=5000, use_reloader=False)

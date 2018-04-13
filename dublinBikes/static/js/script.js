@@ -2,6 +2,7 @@ var station="";
 var infoBox = "";
 /////////////////////
 var markers = [];
+var marker;
 /////////////////////
 function initialize() {
     var mapOptions = {
@@ -33,16 +34,12 @@ function initialize() {
                         colour = 'green';
                     };
                     // markers on map
-                    circle = new google.maps.Circle({
-                        strokeColor: colour,
-                        strokeOpacity: '0.8',
-                        strokeWeight: 2,
-                        fillColor: colour,
-                        fillOpacity: .001,
+                   var positioN = {lat: data[i].position.lat, lng: data[i].position.lng}
+                   marker = new google.maps.Marker({
+                        position: positioN,
                         map: map,
-                        radius: 100,
-                        clickable:true,
-                        center: {lat: data[i].position.lat, lng: data[i].position.lng},
+                        icon: 'http://maps.google.com/mapfiles/ms/icons/' + colour +'-dot.png'
+                       
                     });
 					//var i = 21;
                     infoBox =
@@ -51,7 +48,7 @@ function initialize() {
                          data[i].address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +data[i].available_bikes +"&ensp;&ensp;|&ensp;&ensp;"+data[i].available_bike_stands +
  						"</br> bikes&emsp;stands</div> " +
 						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>";
-                   makeClickable(map, circle, infoBox);
+                   makeClickable(map, marker, infoBox);
                 }
             }
         }
@@ -100,29 +97,22 @@ function off() {
 	///////////////////////////////////
 
 ////////////////////
-//var infowindow;
+var activeinfowindow;
 ///////////////////
-function makeClickable(map, circle, info) {
+function makeClickable(map, marker, info) {
      
-   	 var infowindow = new google.maps.InfoWindow({
+   	var infowindow = new google.maps.InfoWindow({
          content: info
            
      });
-     google.maps.event.addListener(circle, 'click', function(ev) {           
-      hideAllInfoWindows(map, infowindow); 	
-      markers.push(circle);
-       infowindow.setPosition(circle.getCenter());
-	   map.panTo(circle.getCenter());
-	   infowindow.open(map);
-       
+    
+     google.maps.event.addListener(marker, 'click', function() {           
+     if(activeinfowindow) {activeinfowindow.close();}
+        infowindow.open(map,marker);
+        activeinfowindow = infowindow;
+
           
      });
-}
-
-function hideAllInfoWindows(map, infowindow) {
-	markers.forEach(function(circle){
-		infowindow.close(map,circle);
-				   });
 }
 
 

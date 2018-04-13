@@ -11,9 +11,7 @@ def dailyBarChart(stationID,dt=datetime.utcnow()):
     if isinstance(dt, str): 
         dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
     weekday = dt.weekday()
-    dt = dt.replace(hour = dt.hour + 1)
-    dt #replace minute
-    dt #replace second
+    #dt = dt
     
     for i in range(0, 24):
         dt = dt.replace(hour = dt.hour + i)

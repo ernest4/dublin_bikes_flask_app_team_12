@@ -7,10 +7,19 @@ from dublinBikes import myDatabase
 from datetime import datetime
 import numpy as np
 
-def dailyBarChart(stationID,dt):
+def dailyBarChart(stationID,dt=datetime.utcnow()):
     if isinstance(dt, str): 
         dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
     weekday = dt.weekday()
+    dt = dt.replace(hour = dt.hour + 1)
+    dt #replace minute
+    dt #replace second
+    
+    for i in range(0, 24):
+        dt = dt.replace(hour = dt.hour + i)
+        print(dt.weekday(), dt)
+    
+    '''
     df = myDatabase.getBikeWeather(stationID)
     df['weekday'] = df['datetime'].dt.dayofweek
     df['Hour'] = df['datetime'].dt.hour
@@ -24,11 +33,14 @@ def dailyBarChart(stationID,dt):
     #df.set_index('weekday',inplace=True)
     #print(df)
     #df = df[['weather','Hour','availableBikes']]
-    print(df)
+    #print(df)
     
     #df_resamp = df_thisweekday['availableBikes'].resample('H').mean()
     #print(df_resamp)
+    '''
         
     #result = list(zip(map(lambda x:x.isoformat(), df_resamp.index ), df_resamp.values))
     #print(result)
-dailyBarChart(42, datetime.utcnow())
+    
+dailyBarChart(42)
+

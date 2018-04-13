@@ -11,6 +11,7 @@ from datetime import datetime
 import json
 
 from dublinBikes.myDatabase import getOpenWeather
+from dublinBikes.dailyBarChart import dailyBarChart
 
 #global vars
 justStarted = True #global var indicating if this the server has just started
@@ -43,11 +44,7 @@ def weeklyJSONtoFrontEnd(stationNumber):
 
 @application.route("/weekly/analytic/<stationNumber>")
 def weeklyAnalyticJSONtoFrontEnd(stationNumber):
-    return "Analytics for" + stationNumber
-
-@application.route("/testplot")
-def testPlot():
-    return render_template('testPlot.html')
+    return application.response_class(response=dailyBarChart(stationNumber), status=200, mimetype='application/json')
 
 @application.route("/api") #For debugging, check the JCD API scraper status
 def status():

@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestRegressor
 import requests,json,sys
 from builtins import str
 from datetime import datetime,timezone
+import time
 
 def getForecast():
     try:
@@ -129,7 +130,8 @@ def analytic(stationID,dt):
     #print(predictions[0])
     return predictions[0]
 
-analytic(42, datetime(2018, 4, 13, 16, 0))
+print(datetime.fromtimestamp(time.time() + 3600*3))
+analytic(42, datetime.fromtimestamp(time.time() + 3600*3))
 #pre:24.586715367965375
 '''
 #------------------------------------------------------------------------------ 

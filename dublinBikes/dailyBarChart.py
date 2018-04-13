@@ -4,20 +4,41 @@ Created on 12 Apr 2018
 @author: naomiwang
 '''
 from dublinBikes import myDatabase
+from dublinBikes.dataAnalytics import analytic
 from datetime import datetime
+import time
 import numpy as np
 
-def dailyBarChart(stationID,dt=datetime.utcnow()):
-    if isinstance(dt, str): 
-        dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
-    weekday = dt.weekday()
-    dt = dt.replace(hour = dt.hour + 1)
-    dt #replace minute
-    dt #replace second
+def dailyBarChart(stationID):
+    #dt = datetime.fromtimestamp(time.time())
+    #print(dt)
+    #dt = datetime.utcnow()
+    
+    #if isinstance(dt, str): 
+    #    dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
+        
+    #dt = dt.replace(hour = dt.hour + 1)
+    #dt #replace minute
+    #dt #replace second
+    
+    timeMilis = time.time()
+    print(timeMilis)
     
     for i in range(0, 24):
-        dt = dt.replace(hour = dt.hour + i)
-        print(dt.weekday(), dt)
+        #dt = dt.replace(hour = dt.hour + i)
+        timeMilis += 3600 #60 * 60 = 1h
+        dt = datetime.fromtimestamp(timeMilis)
+        #print(dt.hour, dt.weekday(), analytic(stationID, dt), dt)
+        print(dt.hour, dt.weekday(), i, dt)
+        
+    
+    #print(json.dumps(queryResult))
+
+    #preparing JSON for front end
+    #for dictionary in queryResult:
+    #    for key in dictionary:
+    #        if key == "Hour":
+    #            print(dictionary[key])
     
     '''
     df = myDatabase.getBikeWeather(stationID)

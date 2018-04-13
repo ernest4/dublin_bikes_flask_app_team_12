@@ -33,6 +33,9 @@ def getForecast():
     
 #dt format:2018-04-11 23:32:00    
 def analytic(stationID,dt):
+#------------------------------------------------------------------------------ 
+# Extract weekday and hour information from dt.
+#------------------------------------------------------------------------------ 
     if isinstance(dt, str): 
         dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
     weekday = dt.weekday()
@@ -45,6 +48,7 @@ def analytic(stationID,dt):
     for i,dict in enumerate(forecastJson["list"]):
         if forecastJson["list"][i]["dt"] == timestamp:
             description = "description_"+ forecastJson["list"][i]["weather"][0]["description"]
+            #description = forecastJson["list"][i]["weather"][0]["description"]
             if forecastJson["list"][i]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
                 weather = 1
             else:
@@ -53,7 +57,8 @@ def analytic(stationID,dt):
     if description == None:
         sys.exit("[Error 1] Fail to extract description from json.")
     test = [weather,weekday,hour]
-    desList = ['description_Sky is Clear', 'description_broken clouds', 'description_clear sky', 'description_few clouds', 'description_fog', 'description_light intensity drizzle', 'description_light intensity drizzle rain', 'description_light intensity shower rain', 'description_light rain', 'description_light shower sleet', 'description_mist', 'description_moderate rain', 'description_proximity shower rain', 'description_scattered clouds', 'description_shower rain']
+    #'description_Sky is Clear', is the dummy not shown
+    desList = [ 'description_broken clouds', 'description_clear sky', 'description_few clouds', 'description_fog', 'description_light intensity drizzle', 'description_light intensity drizzle rain', 'description_light intensity shower rain', 'description_light rain', 'description_light shower sleet', 'description_mist', 'description_moderate rain', 'description_proximity shower rain', 'description_scattered clouds', 'description_shower rain']
     for d in desList:
         if d == description:
             test.append(1)
@@ -61,6 +66,10 @@ def analytic(stationID,dt):
             test.append(0)
     #print(test)
     testSet = np.asarray(test).reshape(1,-1)
+    
+#------------------------------------------------------------------------------ 
+# Random forest
+#------------------------------------------------------------------------------ 
     bikeWeather = myDatabase.getBikeWeather(stationID)
     #bikeWeather = myDatabase.getBikeWeather(42) #testing
     #print(bikeWeather)
@@ -80,11 +89,14 @@ def analytic(stationID,dt):
     # Target feature: availableBikes
     #df = dfAll.drop(['humidity','temp','icon'],axis=1)
     
-    df_dummies = pd.get_dummies(bikeWeather, columns=['description'])
-    #print(df_dummies)
+    #df_dummies = bikeWeather.join(pd.get_dummies(bikeWeather,drop_first=True))
+    labels = np.array(bikeWeather['availableBikes'])
+    df_dummies = bikeWeather.drop(['humidity','temp','icon','availableBikes','datetime'],axis=1)
+    df_dummies = pd.get_dummies(df_dummies,drop_first=True)
+    print(df_dummies)
     
-    labels = np.array(df_dummies['availableBikes'])
-    features = df_dummies.drop(['humidity','temp','icon','availableBikes','datetime'],axis=1)
+    #labels = np.array(df_dummies['availableBikes'])
+    #features = df_dummies.drop(['humidity','temp','icon','availableBikes','datetime'],axis=1)
     #feature_list = list(features.columns)
     #print(feature_list)
     #['weather', 'weekday', 'Hour', 'description_Sky is Clear', 'description_broken clouds', 
@@ -93,7 +105,7 @@ def analytic(stationID,dt):
     #'description_light rain',
     # 'description_light shower sleet', 'description_mist', 'description_moderate rain', 
     #'description_proximity shower rain', 'description_scattered clouds', 'description_shower rain']
-    features = np.array(features)
+    features = np.array(df_dummies)
     #print(features)
     '''
     train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size = 0.3, random_state = 47)
@@ -117,7 +129,7 @@ def analytic(stationID,dt):
     #print(predictions[0])
     return predictions[0]
 
-#analytic(42, datetime.utcnow())
+analytic(42, datetime(2018, 4, 13, 16, 0))
 #pre:24.586715367965375
 '''
 #------------------------------------------------------------------------------ 

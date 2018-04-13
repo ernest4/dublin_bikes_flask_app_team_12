@@ -52,15 +52,31 @@ HEADING
 **************************/
 
 header {
-    float: left;
+
     margin: 0 0 30px 0;
     padding: 5px 0 0 0;
     width: 100%;
 }
+#headertext{
+	float:none;
+}
+.logo{
+	height: 100px;
+	width: 100px;
+	
+}
+#logo1{
+	float:right;
+	padding: 0px 50px 0px 0px;
+}
+#logo2{
+	float:left;
+	padding: 0px 0px 0px 50px;
+}
 
-#logo {
+#head {
     text-align: center;
-    margin: 0;
+    margin: 100px;
 }
 
 h1 {
@@ -236,7 +252,7 @@ body {
 }
 /* green header */
 header {
-    background: #23a1a6;
+    background: #124250;
     border-color: #599a68;
 }
 

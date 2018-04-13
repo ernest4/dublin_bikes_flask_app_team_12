@@ -1,9 +1,10 @@
 var station="";
 var infoBox = "";
-/////////////////////
+var activeinfowindow;
 var markers = [];
 var marker;
-/////////////////////
+var weekly_data;
+
 function initialize() {
     var mapOptions = {
         center:new google.maps.LatLng(53.3498,-6.2603),
@@ -11,13 +12,8 @@ function initialize() {
         mapTypeId:google.maps.MapTypeId.ROADMAP,
         scrollwheel:false
     };
-	
-	
     var map=new google.maps.Map(document.getElementById("dublin_map"),mapOptions);
-	
-	
     var url="/jcdapi"
-	
     // Station coordinates are retrieved from JSON  data
     var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange=function() {
@@ -25,7 +21,6 @@ function initialize() {
                 data = JSON.parse(xmlhttp.responseText);
                 for (i=0;i<=data.length;i++) {
                     var colour;
-
                     if (data[i].available_bikes/data[i].bike_stands < 0.2) {
                         colour = 'red';
                     }else if (0.2 <= data[i].available_bikes/data[i].bike_stands && data[i].available_bikes/data[i].bike_stands <= 0.8) {
@@ -38,10 +33,10 @@ function initialize() {
                    marker = new google.maps.Marker({
                         position: positioN,
                         map: map,
-                        icon: 'http://maps.google.com/mapfiles/ms/icons/' + colour +'-dot.png'
-                       
+                        icon: 'http://maps.google.com/mapfiles/ms/icons/' + colour +'-dot.png',
+					    animation: google.maps.Animation.DROP
                     });
-					//var i = 21;
+					
                     infoBox =
     
 					     "<h3 id=\"st_add\" style=\"margin:2px;color:black;font-size:16px;text-align: center;\">" +
@@ -55,13 +50,8 @@ function initialize() {
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
 }
-var weekly_data;
-
 function on(st_ID) {
-	
     document.getElementById("overlay").style.display = "block";
-	
-
 //	var path = '/weekly/' + st_ID;
 //
 //	    var xmlhttp = new XMLHttpRequest();
@@ -95,29 +85,33 @@ function off() {
 	///////////////////////////////////
 	///////// Clickable Map ///////////
 	///////////////////////////////////
-
-////////////////////
-var activeinfowindow;
-///////////////////
-function makeClickable(map, marker, info) {
-     
+function makeClickable(map, marker, info) { 
    	var infowindow = new google.maps.InfoWindow({
-         content: info
-           
-     });
-    
-     google.maps.event.addListener(marker, 'click', function() {           
+         content: info        
+     });	
+	 
+     google.maps.event.addListener(marker, 'click', function() {   
+		 marker.setAnimation(google.maps.Animation.BOUNCE);
+		 
+		 
      if(activeinfowindow) {activeinfowindow.close();}
         infowindow.open(map,marker);
-        activeinfowindow = infowindow;
-
-          
+        activeinfowindow = infowindow;     
      });
+	
+	marker.addListener('click', function () {
+    marker.setAnimation(null);
+});
 }
 
 
-
-
+function toggleBounce() {
+        if (marker.getAnimation() !== null) {
+          marker.setAnimation(null);
+        } else {
+          marker.setAnimation(google.maps.Animation.BOUNCE);
+        }
+}
 
 
 function drawChart()

@@ -137,3 +137,6 @@ export_graphviz(tree, out_file = 'tree.dot', feature_names = feature_list, round
 # Write graph to a png file
 graph.write_png('tree.png')
 '''
+
+
+#print(list(zip(map(lambda x:x.isoformat(), bikeWeather.index ), bikeWeather .values)))

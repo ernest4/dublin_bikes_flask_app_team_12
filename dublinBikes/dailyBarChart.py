@@ -8,60 +8,27 @@ from dublinBikes.dataAnalytics import analytic
 from datetime import datetime
 import time
 import numpy as np
+import json
 
 def dailyBarChart(stationID):
-    #dt = datetime.fromtimestamp(time.time())
-    #print(dt)
-    #dt = datetime.utcnow()
+    timeMilis = (time.time() + 3600)//1000*1000
+    #print(timeMilis)
+    #print(datetime.fromtimestamp(timeMilis))
     
-    #if isinstance(dt, str): 
-    #    dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
-        
-    #dt = dt.replace(hour = dt.hour + 1)
-    #dt #replace minute
-    #dt #replace second
-    
-    timeMilis = time.time()
-    print(timeMilis)
-    
+    returnJSON = []
+    #[{"Hour": 0, "Weekday": 1, "avgAvailableBikes": 17.0556},
+    # {"Hour": 0, "Weekday": 2, "avgAvailableBikes": 23.0}, ...]
     for i in range(0, 24):
-        #dt = dt.replace(hour = dt.hour + i)
-        timeMilis += 3600 #60 * 60 = 1h
         dt = datetime.fromtimestamp(timeMilis)
         #print(dt.hour, dt.weekday(), analytic(stationID, dt), dt)
+        #returnJSON.append({"Hour": dt.hour, "Weekday": dt.weekday(), "avgAvailableBikes": analytic(stationID, dt)})
         print(dt.hour, dt.weekday(), i, dt)
+        returnJSON.append({"Hour": dt.hour, "Weekday": dt.weekday(), "avgAvailableBikes": i})
+        timeMilis += 3600 #60 * 60 = 1h
         
+    print(json.dumps(returnJSON))
     
-    #print(json.dumps(queryResult))
-
-    #preparing JSON for front end
-    #for dictionary in queryResult:
-    #    for key in dictionary:
-    #        if key == "Hour":
-    #            print(dictionary[key])
-    
-    '''
-    df = myDatabase.getBikeWeather(stationID)
-    df['weekday'] = df['datetime'].dt.dayofweek
-    df['Hour'] = df['datetime'].dt.hour
-    df_thisweekday = df[df.weekday == weekday]
-    #df_thisweekday.set_index(['Hour','weather'],inplace=True)
-    df_thisweekday.set_index('weekday',inplace=True)
-    #df = df_thisweekday[np.isfinite(df_thisweekday['availableBikes'])]
-    df = df_thisweekday.drop(['humidity','temp','description','icon','datetime'],axis=1)
-    df.groupby(['Hour', 'weather'])['availableBikes'].mean()
-    print(df)
-    #df.set_index('weekday',inplace=True)
-    #print(df)
-    #df = df[['weather','Hour','availableBikes']]
-    #print(df)
-    
-    #df_resamp = df_thisweekday['availableBikes'].resample('H').mean()
-    #print(df_resamp)
-    '''
-        
-    #result = list(zip(map(lambda x:x.isoformat(), df_resamp.index ), df_resamp.values))
-    #print(result)
+    return json.dumps(returnJSON)
     
 dailyBarChart(42)
 

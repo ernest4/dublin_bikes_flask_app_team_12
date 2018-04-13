@@ -32,11 +32,14 @@ def getForecast():
 
 #def toDatetime(dt):
     
-#dt format:2018-04-11 23:32:00    
+#dt format:2018-04-11 23:32:00  
+#------------------------------------------------------------------------------ 
+# Function return a available bikes number.
+#------------------------------------------------------------------------------ 
 def analytic(stationID,dt):
-#------------------------------------------------------------------------------ 
-# Extract weekday and hour information from dt.
-#------------------------------------------------------------------------------ 
+    #------------------------------------------------------------------------------ 
+    # Extract weekday and hour information from dt.
+    #------------------------------------------------------------------------------ 
     if isinstance(dt, str): 
         dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
     weekday = dt.weekday()
@@ -94,7 +97,7 @@ def analytic(stationID,dt):
     labels = np.array(bikeWeather['availableBikes'])
     df_dummies = bikeWeather.drop(['humidity','temp','icon','availableBikes','datetime'],axis=1)
     df_dummies = pd.get_dummies(df_dummies,drop_first=True)
-    print(df_dummies)
+    #print(df_dummies)
     
     #labels = np.array(df_dummies['availableBikes'])
     #features = df_dummies.drop(['humidity','temp','icon','availableBikes','datetime'],axis=1)
@@ -130,8 +133,11 @@ def analytic(stationID,dt):
     #print(predictions[0])
     return predictions[0]
 
-print(datetime.fromtimestamp(time.time() + 3600*3))
-analytic(42, datetime.fromtimestamp(time.time() + 3600*3))
+#print(datetime.utcnow())
+#print(datetime.fromtimestamp((time.time() + 3600)//1000*1000))
+#print(datetime.fromtimestamp((time.time() + 3600*17)//1000*1000))
+#print(datetime(2018, 4, 14, 16, 0))
+#print(analytic(42, datetime(2018, 4, 14, 16, 0)))
 #pre:24.586715367965375
 '''
 #------------------------------------------------------------------------------ 

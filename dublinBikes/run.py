@@ -17,6 +17,7 @@ from dublinBikes.dailyBarChart import dailyBarChart
 justStarted = True #global var indicating if this the server has just started
 dynamicAPIlastScrape = ""
 staticAPIlastScrape = ""
+openWeatherAPIlastScrape = ""
 
 application = Flask(__name__)
 application.debug = False
@@ -68,18 +69,18 @@ def scrapeJCDAPI():
         if scrapeCount == 288 or justStarted == True: # Run when server launches. Then about every 24h...
             justStarted = False
             scrapeCount = 0
-            staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
+            staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
             print(staticAPIlastScrape)
             myDatabase.populateStaticTable(jcdAPIquery)
 
         else: # Run about every 5 minutes...
             scrapeCount += 1
-            dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
+            dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
             print(dynamicAPIlastScrape)
             myDatabase.populateDynamicTable(jcdAPIquery)
             if scrapeCount % 12 == 0: #Every Hour
+                openWeatherAPIlastScrape = "Scrapping API... Populating Weather data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
                 myDatabase.populateCurrentWeather(getOpenWeather())
-
 
         time.sleep(60*5) #Scrape about every 5 minutes...
 

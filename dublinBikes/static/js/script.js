@@ -91,7 +91,8 @@ function makeClickable(map, marker, info) {
      });	
 	 
      google.maps.event.addListener(marker, 'click', function() {   
-		 marker.setAnimation(google.maps.Animation.BOUNCE);
+		marker.setAnimation(google.maps.Animation.BOUNCE);
+		map.panTo(marker.getPosition());
 		 
 		 
      if(activeinfowindow) {activeinfowindow.close();}
@@ -103,8 +104,6 @@ function makeClickable(map, marker, info) {
     marker.setAnimation(null);
 });
 }
-
-
 function toggleBounce() {
         if (marker.getAnimation() !== null) {
           marker.setAnimation(null);

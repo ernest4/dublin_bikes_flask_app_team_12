@@ -13,6 +13,7 @@ import sys
 import pandas as pd
 from datetime import datetime,timedelta
 from unittest.mock import inplace
+import numpy as np
 
 #  mysql -h dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com -P 3306 -u Admin -p
 
@@ -334,9 +335,19 @@ def getBikeWeather(stationID):
     #print(df_bike['Hourly'])
     #print(df_bike)
     df_bike_resamp = df_bike['availableBikes'].resample('H').mean()
+    #df_bike_resamp = df_bike_resamp[np.isfinite(df_bike_resamp['availableBikes'])]
     #print(df_bike_resamp) 
+    
+    #df1 = df_weather.set_index('Hourly').drop_duplicates(inplace=True)
+    #df2 = df_bike_resamp.drop_duplicates(inplace=True)
+    #print(df1)
+    #print(df2)
+    
     result = pd.concat([df_weather.set_index('Hourly'), df_bike_resamp], axis=1, join='inner')
+    #print(result)
+    
     result = result.drop(['dt'],axis=1)
+    result = result[np.isfinite(result['availableBikes'])]
     #print(result)
     #print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
     return result

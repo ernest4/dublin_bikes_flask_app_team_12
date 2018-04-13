@@ -29,7 +29,9 @@ def getForecast():
         #print(e)
         sys.exit(e)
 
-#2018-04-11 23:32:00    
+#def toDatetime(dt):
+    
+#dt format:2018-04-11 23:32:00    
 def analytic(stationID,dt):
     if isinstance(dt, str): 
         dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
@@ -39,6 +41,7 @@ def analytic(stationID,dt):
         dt = dt.replace(hour = dt.hour -1)
     timestamp = int(dt.replace(tzinfo=timezone.utc).timestamp())
     forecastJson = getForecast()
+    description = None
     for i,dict in enumerate(forecastJson["list"]):
         if forecastJson["list"][i]["dt"] == timestamp:
             description = "description_"+ forecastJson["list"][i]["weather"][0]["description"]
@@ -58,7 +61,7 @@ def analytic(stationID,dt):
             test.append(0)
     #print(test)
     testSet = np.asarray(test).reshape(1,-1)
-    bikeWeather = myDatabase.getBikeWeather(stationID) #testing
+    bikeWeather = myDatabase.getBikeWeather(stationID)
     #bikeWeather = myDatabase.getBikeWeather(42) #testing
     #print(bikeWeather)
     
@@ -69,7 +72,7 @@ def analytic(stationID,dt):
     bikeWeather['Hour'] = bikeWeather['datetime'].dt.hour
     #print(bikeWeather)
     
-    dfAll = bikeWeather[np.isfinite(bikeWeather['availableBikes'])]
+    #dfAll = bikeWeather[np.isfinite(bikeWeather['availableBikes'])]
     #print(dfAll)
     
     #------------------------------------------------------------------------------ 
@@ -77,7 +80,7 @@ def analytic(stationID,dt):
     # Target feature: availableBikes
     #df = dfAll.drop(['humidity','temp','icon'],axis=1)
     
-    df_dummies = pd.get_dummies(dfAll, columns=['description'])
+    df_dummies = pd.get_dummies(bikeWeather, columns=['description'])
     #print(df_dummies)
     
     labels = np.array(df_dummies['availableBikes'])
@@ -114,7 +117,7 @@ def analytic(stationID,dt):
     #print(predictions[0])
     return predictions[0]
 
-#analytic(42, datetime(2018, 4, 11, 21, 0))
+#analytic(42, datetime.utcnow())
 #pre:24.586715367965375
 '''
 #------------------------------------------------------------------------------ 

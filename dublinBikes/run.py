@@ -73,6 +73,7 @@ def scrapeJCDAPI():
             myDatabase.populateDynamicTable(jcdAPIquery)
             if scrapeCount % 12 == 0: #Every Hour
                 openWeatherAPIlastScrape = "Scrapping API... Populating Weather data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
+                print(openWeatherAPIlastScrape)
                 myDatabase.populateCurrentWeather(getOpenWeather())
 
         time.sleep(60*5) #Scrape about every 5 minutes...

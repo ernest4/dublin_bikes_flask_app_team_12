@@ -353,6 +353,6 @@ def getBikeWeather(stationID):
     #print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
     return result
     
-print(getBikeWeather(42).iloc[-1])
+#print(getBikeWeather(42).iloc[-1])
     
 

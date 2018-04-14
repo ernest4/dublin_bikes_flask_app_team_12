@@ -67,6 +67,7 @@ def analytic(stationID):
     if datetime.utcnow().hour % 3 == 0:
         for i in range(1,3):
             dt = datetime.utcnow().replace(hour = datetime.utcnow().hour + i)
+            #print(dt.hour)
             test=[bikeWeather.iloc[-1]['weather'], dt.weekday(), dt.hour]
             for d in desList:
                 if d == "description_" + bikeWeather.iloc[-1]['description']:
@@ -78,6 +79,7 @@ def analytic(stationID):
     if datetime.utcnow().hour % 3 == 1:
         #forecastJson = myDatabase.getOpenWeather()
         dt = datetime.utcnow().replace(hour = datetime.utcnow().hour +1)
+        #print(dt)
         test=[bikeWeather.iloc[-1]['weather'], dt.weekday(), dt.hour]
         for d in desList:
             if d == "description_" + bikeWeather.iloc[-1]['description']:
@@ -89,18 +91,17 @@ def analytic(stationID):
     #description = None
     i=0
     while len(testSet) <24:
-        if i % 3 == 0:
-    #for i,dict in enumerate(forecastJson["list"]):
-        #if forecastJson["list"][i]["dt"] == timestamp:
-            dt = datetime.fromtimestamp(forecastJson["list"][i]["dt"])
+        if i==0 or i % 3 == 0:
+            dt = datetime.utcfromtimestamp(forecastJson["list"][i//3]["dt"])
+            #print(dt)
         else:
-            dt = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).replace(hour = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).hour +1)
+            dt = datetime.utcfromtimestamp(forecastJson["list"][i//3]["dt"]).replace(hour = dt.hour +1)
             
         hour = dt.hour
         weekday = dt.weekday()
-        description = "description_"+ forecastJson["list"][i]["weather"][0]["description"]
+        description = "description_"+ forecastJson["list"][i//3]["weather"][0]["description"]
             #description = forecastJson["list"][i]["weather"][0]["description"]
-        if forecastJson["list"][i]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
+        if forecastJson["list"][i//3]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
             weather = 1
         else:
             weather = 0
@@ -112,46 +113,6 @@ def analytic(stationID):
                 test.append(0)
         testSet.append(test)
         i+=1
-        '''
-        
-        #Second Hour
-        dt = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).replace(hour = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).hour +1)
-        hour = dt.hour
-        weekday = dt.weekday()
-        description = "description_"+ forecastJson["list"][i]["weather"][0]["description"]
-            #description = forecastJson["list"][i]["weather"][0]["description"]
-        if forecastJson["list"][i]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
-            weather = 1
-        else:
-            weather = 0
-        test = [weather,weekday,hour]
-        for d in desList:
-            if d == description:
-                test.append(1)
-            else:
-                test.append(0)
-        testSet.append(test)
-        
-        #Third Hour
-        dt = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).replace(hour = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).hour +1)
-        hour = dt.hour
-        weekday = dt.weekday()
-        description = "description_"+ forecastJson["list"][i]["weather"][0]["description"]
-            #description = forecastJson["list"][i]["weather"][0]["description"]
-        if forecastJson["list"][i]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
-            weather = 1
-        else:
-            weather = 0
-        test = [weather,weekday,hour]
-        for d in desList:
-            if d == description:
-                test.append(1)
-            else:
-                test.append(0)
-        testSet.append(test)
-        
-        i+=1
-        '''
         
     #Good weather: ['Clouds','Clear','Mist']
     #if description == None:
@@ -237,7 +198,7 @@ print(analytic(42, dtest))
 #print(analytic(42, datetime(2018, 4, 14, 16, 0)))
 #pre:24.586715367965375
 '''
-print(analytic(42))
+#print(analytic(42))
 '''
 #------------------------------------------------------------------------------ 
 # Import tools needed for visualization

@@ -53,6 +53,7 @@ def scrapeJCDAPI():
     global justStarted
     global staticAPIlastScrape
     global dynamicAPIlastScrape
+    global openWeatherAPIlastScrape
 
     scrapeCount = 0
 
@@ -65,7 +66,6 @@ def scrapeJCDAPI():
             staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
             print(staticAPIlastScrape)
             myDatabase.populateStaticTable(jcdAPIquery)
-
         else: # Run about every 5 minutes...
             scrapeCount += 1
             dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600)) + " <b>total scrape count</b>: " + str(scrapeCount)

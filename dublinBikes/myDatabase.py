@@ -218,10 +218,12 @@ def weeklyAvailableBikes(stationID):
 
     q=engine.execute(query)
     
-    l = [dict(r) for r in q]
+    preJSON = [dict(r) for r in q]
+    for r in preJSON:
+        r['avgAvailableBikes'] = float(r['avgAvailableBikes']) #converts Decimal() type to pure float type
     #print(l)
     #l[0]['avgAvailableBikes']
-    return l
+    return preJSON
 #weeklyAvailableBikes(42)
 
 #==================================weather=============

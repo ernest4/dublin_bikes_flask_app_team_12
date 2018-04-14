@@ -68,7 +68,7 @@ def scrapeJCDAPI():
 
         else: # Run about every 5 minutes...
             scrapeCount += 1
-            dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600) + " <b>total scrape count</b>: " + str(scrapeCount))
+            dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600)) + " <b>total scrape count</b>: " + str(scrapeCount)
             print(dynamicAPIlastScrape)
             myDatabase.populateDynamicTable(jcdAPIquery)
             if scrapeCount % 12 == 0: #Every Hour

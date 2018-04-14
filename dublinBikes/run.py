@@ -43,7 +43,7 @@ def weeklyJSONtoFrontEnd(stationNumber):
 
     return application.response_class(response=json.dumps(queryResult), status=200, mimetype='application/json')
 
-@application.route("/weekly/analytic/<stationNumber>")
+@application.route("/analytic/<stationNumber>")
 def weeklyAnalyticJSONtoFrontEnd(stationNumber):
     return application.response_class(response=dailyBarChart(stationNumber), status=200, mimetype='application/json')
 

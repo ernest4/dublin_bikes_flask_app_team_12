@@ -44,8 +44,14 @@ def analytic(stationID,dt):
         dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
     weekday = dt.weekday()
     hour = dt.hour
+    
+    print("before correction:",dt.hour)
+    
     while dt.hour % 3 != 0:
         dt = dt.replace(hour = dt.hour -1)
+        
+    print("after correction:",dt.hour)
+    
     timestamp = int(dt.replace(tzinfo=timezone.utc).timestamp())
     forecastJson = getForecast()
     description = None
@@ -132,13 +138,18 @@ def analytic(stationID,dt):
     #Mean Absolute Error: 3.36 
     #print(predictions[0])
     return predictions[0]
-
-#print(datetime.utcnow())
-#print(datetime.fromtimestamp((time.time() + 3600)//1000*1000))
-#print(datetime.fromtimestamp((time.time() + 3600*17)//1000*1000))
+'''
+timeMilis = int(time.time() + 3600*1.5)
+print(timeMilis)
+print(datetime.fromtimestamp(timeMilis))
+print(datetime.fromtimestamp(timeMilis).replace(minute = 0, second = 0))
+dtest = datetime.fromtimestamp(timeMilis).replace(minute = 0, second = 0)
+print(analytic(42, dtest))
 #print(datetime(2018, 4, 14, 16, 0))
 #print(analytic(42, datetime(2018, 4, 14, 16, 0)))
 #pre:24.586715367965375
+'''
+
 '''
 #------------------------------------------------------------------------------ 
 # Import tools needed for visualization

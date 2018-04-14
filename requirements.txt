@@ -14,7 +14,7 @@ cookiecutter==1.6.0
 dockerpty==0.4.1
 docopt==0.6.2
 docutils==0.14
--e git+https://github.com/ernest4/dublin_bikes_flask_app_team_12.git@1ee1888746ff89fdf7f11ccedc8ed2357e23774f#egg=dublinBikes
+-e git+https://github.com/ernest4/dublin_bikes_flask_app_team_12.git@52531766ecbdd8f2cff2a1f3c64b1f5eb3818496#egg=dublinBikes
 ez-setup==0.9
 Flask==0.12.2
 Flask-RESTful==0.3.6
@@ -28,7 +28,10 @@ jinja2-time==0.2.0
 jmespath==0.9.3
 -e git+https://github.com/ernest4/light_checker_assignmnet3.git@c691f9efc05e89dfe867e6bfb55f50b24c643ff4#egg=light_counter
 MarkupSafe==1.0
-numpy==1.14.1
+mkl-fft==1.0.0
+mkl-random==1.0.1
+numpy==1.14.2
+pandas==0.22.0
 pathspec==0.5.5
 pluggy==0.6.0
 poyo==0.4.1
@@ -43,7 +46,9 @@ pythonBoilerplate-3==0.0.post0.dev1+gb6fbaf2.dirty
 pythonBoilerplate3==0.0.post0.dev1+gb6fbaf2
 pytz==2018.3
 PyYAML==3.12
-requests==2.9.1
+requests==2.18.4
+scikit-learn==0.19.1
+scipy==1.0.1
 semantic-version==2.5.0
 six==1.11.0
 SQLAlchemy==1.2.5

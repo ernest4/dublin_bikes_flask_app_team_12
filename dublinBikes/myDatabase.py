@@ -13,6 +13,7 @@ import sys
 import pandas as pd
 from datetime import datetime,timedelta
 from unittest.mock import inplace
+import numpy as np
 
 #  mysql -h dublinbike.cztklqig6iua.us-west-2.rds.amazonaws.com -P 3306 -u Admin -p
 
@@ -28,27 +29,22 @@ from unittest.mock import inplace
 def getJCD():
     try:
         request = requests.get('''https://api.jcdecaux.com/vls/v1/stations?contract=Dublin&apiKey=8304657448dbad4944ed9a956f3855be76545f17''').content.decode('utf-8')
-        try:
-            stationsJson = json.loads(request)
-    #print(stationsJson[0])
+        stationsJson = json.loads(request)
+        #print(stationsJson[0])
+
+        for item in stationsJson:
+            #print(stationsJson[i])
+            if item["last_update"] != None:
+                item["last_update"]//=1000
+                #stationsJson[i]["last_update"] = datetime.datetime.fromtimestamp(stationsJson[i]["last_update"])
+                #print("datetime:",stationsJson[i]["last_update"])
+                # Just in case I want to use weekday later:
+                #datetime.fromtimestamp(ep/1000).strftime("%A")
+            else:
+                pass
+        return stationsJson
     
-            for item in stationsJson:
-                #print(stationsJson[i])
-                if item["last_update"] != None:
-                    item["last_update"]//=1000
-                    #stationsJson[i]["last_update"] = datetime.datetime.fromtimestamp(stationsJson[i]["last_update"])
-                    #print("datetime:",stationsJson[i]["last_update"])
-                    # Just in case I want to use weekday later:
-                    #datetime.fromtimestamp(ep/1000).strftime("%A")
-                else:
-                    pass
-            return stationsJson
-        
-        except ValueError as e:
-            print(e)
-            sys.exit(1)
-    
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
+    except (ValueError, requests.exceptions.RequestException) as e:
         print(e)
         sys.exit(1)
     
@@ -256,23 +252,19 @@ def populateHistoryWeather(df):
 def getOpenWeather():
     try:
         request = requests.get('http://openweathermap.org/data/2.5/weather?q=dublin&appid=b6907d289e10d714a6e88b30761fae22').content.decode('utf-8')
-        try:
-            currentWeatherJson = json.loads(request)
-    #print(stationsJson[0])
+        currentWeatherJson = json.loads(request)
+        #print(stationsJson[0])
+
+        if currentWeatherJson != None:
+            #print(currentWeatherJson)
+            return currentWeatherJson
+        else:
+            print('[Error 0] The weather json is empty.')
     
-            if currentWeatherJson != None:
-                #print(currentWeatherJson)
-                return currentWeatherJson
-            else:
-                print('[Error 0] The weather json is empty.')
-        
-        except ValueError as e:
-            #print(e)
-            sys.exit(e)
-    
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
+    except (ValueError, requests.exceptions.RequestException) as e:
         #print(e)
         sys.exit(e)
+        
 #getOpenWeather()
 
 weatherBase = automap_base()
@@ -325,7 +317,7 @@ def populateCurrentWeather(weatherJson):
 #------------Combine weather with bike-------------
 
 
-def bikeWeather(stationID):
+def getBikeWeather(stationID):
     weatherQuery = '''select * from weather'''
     df_weather = pd.read_sql_query(weatherQuery,engine)
     #print(df_weather)
@@ -343,12 +335,24 @@ def bikeWeather(stationID):
     #print(df_bike['Hourly'])
     #print(df_bike)
     df_bike_resamp = df_bike['availableBikes'].resample('H').mean()
+    #df_bike_resamp = df_bike_resamp[np.isfinite(df_bike_resamp['availableBikes'])]
     #print(df_bike_resamp) 
-    result = pd.concat([df_weather.set_index('Hourly'), df_bike_resamp], axis=1, join='inner')
-    result = result.drop(['datetime','dt'],axis=1)
-    #print(result)
-    print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
     
-bikeWeather(42)
+    #df1 = df_weather.set_index('Hourly').drop_duplicates(inplace=True)
+    #df2 = df_bike_resamp.drop_duplicates(inplace=True)
+    #print(df1)
+    #print(df2)
+    
+    result = pd.concat([df_weather.set_index('Hourly'), df_bike_resamp], axis=1, join='inner')
+    #print(result)
+    
+    result = result.drop(['humidity','temp','icon','dt'],axis=1)
+    #df_dummies = bikeWeather.drop(['humidity','temp','icon','availableBikes','datetime'],axis=1)
+    result = result[np.isfinite(result['availableBikes'])]
+    #print(result)
+    #print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
+    return result
+    
+#print(getBikeWeather(42).iloc[-1])
     
 

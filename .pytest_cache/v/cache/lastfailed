@@ -1,1 +1,3 @@
-{}
+{
+  "tests/test_dublinBikes.py::test_index": true
+}

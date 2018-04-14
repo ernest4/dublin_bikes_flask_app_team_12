@@ -10,13 +10,14 @@ from dublinBikes import myDatabase
 from datetime import datetime
 import json
 
-import sys
 from dublinBikes.myDatabase import getOpenWeather
+from dublinBikes.dailyBarChart import dailyBarChart
 
 #global vars
 justStarted = True #global var indicating if this the server has just started
 dynamicAPIlastScrape = ""
 staticAPIlastScrape = ""
+openWeatherAPIlastScrape = ""
 
 application = Flask(__name__)
 application.debug = False
@@ -32,25 +33,18 @@ def jcdAPItoFrontEnd():
 @application.route('/weekly/<stationNumber>')
 def weeklyJSONtoFrontEnd(stationNumber):
     queryResult = myDatabase.weeklyAvailableBikes(stationNumber)
-    #print(json.dumps(queryResult))
-
-    #preparing JSON for front end
-    #for dictionary in queryResult:
-    #    for key in dictionary:
-    #        if key == "Hour":
-    #            print(dictionary[key])
-
     return application.response_class(response=json.dumps(queryResult), status=200, mimetype='application/json')
 
-@application.route("/testplot")
-def testPlot():
-    return render_template('testPlot.html')
+@application.route("/analytic/<stationNumber>")
+def weeklyAnalyticJSONtoFrontEnd(stationNumber):
+    return application.response_class(response=dailyBarChart(stationNumber), status=200, mimetype='application/json')
 
 @application.route("/api") #For debugging, check the JCD API scraper status
 def status():
     return "API scrapers <b>alive</b>: " + str(apiScarepThread.is_alive()) + \
         "<br><br>Last update:<br> Static [every 24h]: " + staticAPIlastScrape + \
-        " <br>Dynamic [every 5 minutes]: " + dynamicAPIlastScrape
+        " <br>Dynamic [every 5 minutes]: " + dynamicAPIlastScrape + \
+        " <br>Weather [every 1h]: " + openWeatherAPIlastScrape
 
 
 
@@ -68,18 +62,18 @@ def scrapeJCDAPI():
         if scrapeCount == 288 or justStarted == True: # Run when server launches. Then about every 24h...
             justStarted = False
             scrapeCount = 0
-            staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
+            staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
             print(staticAPIlastScrape)
             myDatabase.populateStaticTable(jcdAPIquery)
 
         else: # Run about every 5 minutes...
             scrapeCount += 1
-            dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time()))
+            dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
             print(dynamicAPIlastScrape)
             myDatabase.populateDynamicTable(jcdAPIquery)
             if scrapeCount % 12 == 0: #Every Hour
+                openWeatherAPIlastScrape = "Scrapping API... Populating Weather data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
                 myDatabase.populateCurrentWeather(getOpenWeather())
-
 
         time.sleep(60*5) #Scrape about every 5 minutes...
 

@@ -3,7 +3,7 @@ Created on 26 Mar 2018
 
 @author: naomiwang
 '''
-from dublinBikes.myDatabase import getJCD,populateDynamicTable,populateStaticTable,query,weeklyAvailableBikes
+from dublinBikes.myDatabase import *
 
 def testGetJCD():
     assert getJCD()

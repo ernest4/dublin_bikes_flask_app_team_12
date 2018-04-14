@@ -11,11 +11,11 @@ Run the application:
 
     comp30670_dublinBikes
     
-    When asked if you run locally answer yes if you're running on laptop or no if running EC2. 
-    (Different port numbers will be assigned in each case. 5000 for local, 80 for EC2.)
-    
     Open it in the browser at (local)   http://localhost:5000/
-    Open it in the browser at (EC2)     http://35.162.27.252:80/
+    
+    
+    
+Open it in the browser, i.e. accesing from EC2     http://18.236.108.235:5000/
 
 
 ## Prerequisites

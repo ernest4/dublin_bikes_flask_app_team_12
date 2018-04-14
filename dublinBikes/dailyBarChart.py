@@ -10,7 +10,7 @@ import time
 import json
 
 def dailyBarChart(stationID):
-    timeMilis = int(time.time() + 3600)
+    timeMilis = int(time.time() + 3600*2)
     occupancy24h = analytic(stationID)
     
     returnJSON = []

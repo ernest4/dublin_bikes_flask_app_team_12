@@ -4,79 +4,40 @@
         <meta charset="utf-8">
         <title>Dublin bikes</title>
         <link rel="stylesheet" href="../static/css/main.css">
-<!--weather.js uses jquery -->
         <script src="/static/js/jquery-3.2.0.min.js"></script>
-		
 		<script type="text/javascript" src="../static/js/script.js"></script>
-		
-		<!-- Google Charts scripts 		-->
-		<!--		reference to the API -->
-		
-		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-		
-
-		
-		
-        
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-	
-		
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-	
     <body>
-		
-<!--	overlay to contain charts + extra information    -->
-		
-		
 		<div id="overlay" onclick="off()">
   			<div id="text">Overlay Text</div>
-			 <div id="daily_chart"></div>
-<!--             <div id="weekly_chart" style="float:right"></div>-->
+			<div id="daily_chart"></div>
 		</div>
-<!--------------------------------------------------------->
-		
-		
         <header>
-            <a href="/" id="logo">
-                <h1>( logo )Dublin Bikes</h1>
-                <h2>Real time tracker
+            <a href="/" id="head">
+				<img class='logo' id='logo1' src ="../static/img/dublinbike.png">
+				<img class='logo' id='logo2' src ="../static/img/dublinbike.png">
+				<div id=headertext>
+					<h1>dublin bikes</h1>
+					<h2>Real time tracker</h2>
+				</div>
+				
 					<script src="../static/js/weather.js"></script>
-				</h2>
+				
             </a>
-            <nav>
-				<section class="container">
-                		<form class="search" method="post" action="/">
-							<input type="search" name="q" placeholder="..." 	autocomplete="on">
-                  			<ul class="search-ac">
-								<li><a href="/">PARNELL SQUARE NORTH<br></a></li>
-								<li><a href="/">CLONMEL STREET<br></a></li>
-								<li><a href="/">MOUNT STREET LOWER</a></li>
-								<li><a href="/">CHRISTCHURCH PLACE<br></a></li>
-								<li><a href="/">GRANTHAM STREET<br></a></li>
-								<li><a href="/">PEARSE STREET<br></a></li>
-								<li><a href="/">YORK STREET EAST</a></li>
-							</ul>
-						</form>
-				</section>
-            </nav>
+            <nav></nav>
         </header>
-        <div id="wrapper">
+         <div id="wrapper">
             <h3><i> </i></h3>
                 <ul id="sections">
-
                     <li class="mapper">
-						
-				<div class="weatherDiv" id="overlay1"> 
-							<div id="icon">--</div>
+						<div class="weatherDiv" id="overlay1">
+						<div id="icon">--</div>
 						<div id="currentWeather">--</div>
 						<div id="windspeed">--</div>
-                            <div id="currentTemp">--</div>
-				
-					   		
-				</div>
-                            <div id="dublin_map"> </div>
+						<div id="currentTemp">--</div>
+						</div>
+                        <div id="dublin_map"> </div>
 					</li>
 			</ul>
             <footer>

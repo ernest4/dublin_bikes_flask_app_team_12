@@ -10,9 +10,11 @@ import numpy as np
 #from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 import requests,json,sys
-from builtins import str
-from datetime import datetime,timezone
+from datetime import datetime
 
+#------------------------------------------------------------------------------
+# Get forecast from open weather API, return a json file.
+#------------------------------------------------------------------------------ 
 def getForecast():
     try:
         request = requests.get('http://openweathermap.org/data/2.5/forecast?q=dublin&appid=b6907d289e10d714a6e88b30761fae22').content.decode('utf-8')
@@ -29,33 +31,11 @@ def getForecast():
         #print(e)
         sys.exit(e)
 
-#def toDatetime(dt):
-    
-#dt format:2018-04-11 23:32:00  
 #------------------------------------------------------------------------------ 
 # Function return a available bikes number.
 #------------------------------------------------------------------------------ 
-#def analytic(stationID,dt=datetime.utcnow()):
 def analytic(stationID):
-    #------------------------------------------------------------------------------ 
-    # Extract weekday and hour information from dt.
-    #------------------------------------------------------------------------------ 
-    '''
-    if isinstance(dt, str): 
-        dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
-    weekday = dt.weekday()
-    hour = dt.hour
-    
-    print("before correction:",dt.hour)
-    
-    #if dt.hour % 3 + dt.hour >= 0
-    while dt.hour % 3 != 0:
-        dtAdjusted = dt.replace(hour = dt.hour -1)
-        
-    print("after correction:",dt.hour)
-    
-    timestamp = int(dt.replace(tzinfo=timezone.utc).timestamp())
-    '''
+    #Start with time of now.
     weekday = datetime.utcnow().weekday()
     hour = datetime.utcnow().hour
     
@@ -64,6 +44,10 @@ def analytic(stationID):
     testSet = []
     desList = [ 'description_broken clouds', 'description_clear sky', 'description_few clouds', 'description_fog', 'description_light intensity drizzle', 'description_light intensity drizzle rain', 'description_light intensity shower rain', 'description_light rain', 'description_light shower sleet', 'description_mist', 'description_moderate rain', 'description_proximity shower rain', 'description_scattered clouds', 'description_shower rain']
     
+    # Because open weather API will return forecast for every 3 hours, 
+    # so there could be gap between now and forecast.
+     
+    # Case1: two hours to open weather API forecast time.
     if datetime.utcnow().hour % 3 == 0:
         for i in range(1,3):
             dt = datetime.utcnow().replace(hour = datetime.utcnow().hour + i)
@@ -76,8 +60,8 @@ def analytic(stationID):
                     test.append(0)
             testSet.append(test) 
         
+    # Case2: one hour to open weather API forecast time.
     if datetime.utcnow().hour % 3 == 1:
-        #forecastJson = myDatabase.getOpenWeather()
         dt = datetime.utcnow().replace(hour = datetime.utcnow().hour +1)
         #print(dt)
         test=[bikeWeather.iloc[-1]['weather'], dt.weekday(), dt.hour]
@@ -88,19 +72,22 @@ def analytic(stationID):
                 test.append(0)
         testSet.append(test)  
     
-    #description = None
+    # Forecast part.
+    # Using the same weather forecast for three hours to populate three test set with different 'hour'.
     i=0
     while len(testSet) <24:
+        # Every 3 hour itself
         if i==0 or i % 3 == 0:
             dt = datetime.utcfromtimestamp(forecastJson["list"][i//3]["dt"])
             #print(dt)
+        # Moving only hour forward.
         else:
             dt = datetime.utcfromtimestamp(forecastJson["list"][i//3]["dt"]).replace(hour = dt.hour +1)
             
         hour = dt.hour
         weekday = dt.weekday()
         description = "description_"+ forecastJson["list"][i//3]["weather"][0]["description"]
-            #description = forecastJson["list"][i]["weather"][0]["description"]
+        #Good weather: ['Clouds','Clear','Mist']
         if forecastJson["list"][i//3]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
             weather = 1
         else:
@@ -114,34 +101,17 @@ def analytic(stationID):
         testSet.append(test)
         i+=1
         
-    #Good weather: ['Clouds','Clear','Mist']
-    #if description == None:
-     #   sys.exit("[Error 1] Fail to extract description from json.")
-    
-    #'description_Sky is Clear', is the dummy not shown
-    #desList = [ 'description_broken clouds', 'description_clear sky', 'description_few clouds', 'description_fog', 'description_light intensity drizzle', 'description_light intensity drizzle rain', 'description_light intensity shower rain', 'description_light rain', 'description_light shower sleet', 'description_mist', 'description_moderate rain', 'description_proximity shower rain', 'description_scattered clouds', 'description_shower rain']
-    
-    #print(test)
-    #testSet = np.asarray(test)#.reshape(1,-1)
     testSet = np.array([np.array(xi) for xi in testSet])
     #print(testSet)
     
-#------------------------------------------------------------------------------ 
-# Random forest
-#------------------------------------------------------------------------------ 
-    #bikeWeather = myDatabase.getBikeWeather(stationID)
-    #bikeWeather = myDatabase.getBikeWeather(42) #testing
-    #print(bikeWeather)
-    
-    #print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values)))
+    #------------------------------------------------------------------------------ 
+    # Random forest Training, using all data
+    #------------------------------------------------------------------------------ 
     
     bikeWeather['weekday'] = bikeWeather['datetime'].dt.dayofweek
     #print(bikeWeather) 
     bikeWeather['Hour'] = bikeWeather['datetime'].dt.hour
     #print(bikeWeather)
-    
-    #dfAll = bikeWeather[np.isfinite(bikeWeather['availableBikes'])]
-    #print(dfAll)
     
     #------------------------------------------------------------------------------ 
     # First training, using features:  description, weather, weekday, Hour
@@ -149,10 +119,13 @@ def analytic(stationID):
     #df = dfAll.drop(['humidity','temp','icon'],axis=1)
     
     #df_dummies = bikeWeather.join(pd.get_dummies(bikeWeather,drop_first=True))
+    # labels is the target feature.
     labels = np.array(bikeWeather['availableBikes'])
+    # df_dummies are the training features.
     df_dummies = bikeWeather.drop(['availableBikes','datetime'],axis=1)
     df_dummies = pd.get_dummies(df_dummies,drop_first=True)
     #print(df_dummies)
+    
     
     #labels = np.array(df_dummies['availableBikes'])
     #features = df_dummies.drop(['humidity','temp','icon','availableBikes','datetime'],axis=1)
@@ -166,6 +139,8 @@ def analytic(stationID):
     #'description_proximity shower rain', 'description_scattered clouds', 'description_shower rain']
     features = np.array(df_dummies)
     #print(features)
+    
+    # Training and test split below...
     '''
     train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size = 0.3, random_state = 47)
     
@@ -187,21 +162,14 @@ def analytic(stationID):
     #Mean Absolute Error: 3.36 
     #print(predictions[0])
     return predictions#[0]
-'''
-timeMilis = int(time.time() + 3600*1.5)
-print(timeMilis)
-print(datetime.fromtimestamp(timeMilis))
-print(datetime.fromtimestamp(timeMilis).replace(minute = 0, second = 0))
-dtest = datetime.fromtimestamp(timeMilis).replace(minute = 0, second = 0)
-print(analytic(42, dtest))
-#print(datetime(2018, 4, 14, 16, 0))
-#print(analytic(42, datetime(2018, 4, 14, 16, 0)))
-#pre:24.586715367965375
-'''
+
 #print(analytic(42))
+
+
 '''
 #------------------------------------------------------------------------------ 
 # Import tools needed for visualization
+#------------------------------------------------------------------------------ 
 from sklearn.tree import export_graphviz
 import pydot
 

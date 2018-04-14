@@ -1,6 +1,10 @@
 var station="";
 var infoBox = "";
+var activeinfowindow;
 var markers = [];
+var marker;
+var weekly_data;
+
 function initialize() {
     var mapOptions = {
         center:new google.maps.LatLng(53.3498,-6.2603),
@@ -15,18 +19,7 @@ function initialize() {
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 data = JSON.parse(xmlhttp.responseText);
-
-				////////////// console.log  //////////////
-				//////////////////////////////////////////				
-
-
-	
-				//////////////////////////////////////////
-				
-				
-				
                 for (i=0;i<=data.length;i++) {
-
                     var colour;
                     if (data[i].available_bikes/data[i].bike_stands < 0.2) {
                         colour = 'red';
@@ -36,143 +29,95 @@ function initialize() {
                         colour = 'green';
                     };
                     // markers on map
-                    circle = new google.maps.Circle({
-                        strokeColor: colour,
-                        strokeOpacity: '0.8',
-                        strokeWeight: 2,
-                        fillColor: colour,
-                        fillOpacity: .001,
+                   var positioN = {lat: data[i].position.lat, lng: data[i].position.lng}
+                   marker = new google.maps.Marker({
+                        position: positioN,
                         map: map,
-                        radius: 100,
-                        clickable:true,
-                        center: {lat: data[i].position.lat, lng: data[i].position.lng},
+                        icon: 'http://maps.google.com/mapfiles/ms/icons/' + colour +'-dot.png',
+					    animation: google.maps.Animation.DROP
                     });
+					
                     infoBox =
-
-//                        "<h3 id=\"st_add\" style=\"margin:2px;\">" + 
-//                        data[i].address + 
-//                        "</h2><span style=\"text-align:center;font-size:10px;color:black;\">Bikes: " + data[i].available_bikes + "</br>Docking Stations: " 
-//                        + data[i].available_bike_stands +
-//						 "<br/><button onclick=\"on("+i+")\">... click for more detail...</button>"    
-//					// passing an int works but not a string ??
-//						// "<br/><button onclick=\"on(\'"+ data[i].address+ "\')\">... click for more detail...</button>"
-//					
-
-                        "<h3 id=\"st_add\" style=\"margin:2px;color:black;font-size:16px;text-align: center;\">" +
-                        data[i].address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +data[i].available_bikes +"&ensp;&ensp;|&ensp;&ensp;"+data[i].available_bike_stands +
-						"</br> bikes&emsp;stands</div> " +
-						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>"
-
-                    ;
-                   makeClickable(map, circle, infoBox);
+    
+					     "<h3 id=\"st_add\" style=\"margin:2px;color:black;font-size:16px;text-align: center;\">" +
+                         data[i].address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +data[i].available_bikes +"&ensp;&ensp;|&ensp;&ensp;"+data[i].available_bike_stands +
+ 						"</br> bikes&emsp;stands</div> " +
+						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>";
+                   makeClickable(map, marker, infoBox);
                 }
             }
         }
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
 }
-
-
-
-	//////////////////////////////////////////
-	////////////// from analytics: ///////////
-	//////////////////////////////////////////
-
-// global variable (numbers for graphs)
-
-	///////////////////////////////////
-	////////////// overlay ////////////
-	///////////////////////////////////
-
-
-var weekly_data;
-
 function on(st_ID) {
     document.getElementById("overlay").style.display = "block";
-	document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + st_ID;
+//	var path = '/weekly/' + st_ID;
+//
+//	    var xmlhttp = new XMLHttpRequest();
+//        xmlhttp.onreadystatechange=function() {
+//            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+//                weekly_data = JSON.parse(xmlhttp.responseText);
+//                drawGraph();
+//            }
+//        }
+//        xmlhttp.open("GET", path, true);
+//        xmlhttp.send();
 	
-	var path = '/weekly/' + st_ID;  // --> "/weekly/69"
-	    var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange=function() {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                
-                weekly_data = JSON.parse(xmlhttp.responseText);
-          		console.log(weekly_data);
-				// this function will generate the visuals
-                drawGraph();
-            }
-        }
-        xmlhttp.open("GET", path, true);
-        xmlhttp.send();
-
-	
-	
-	// run query on database 
-	// select all from DB where num = num;
-	// getElementByID
-	//document.getElementById("text").innerHTML="<h3 id=\"st_add\" style=\"margin:2px;\">" + st_ID;
-
 	var path = '/weekly/'+st_ID;
 	google.charts.load('current', {'packages':['corechart']});
-
-	//google.charts.setOnLoadCallback();
 	var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange=function() {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
+        xmlhttp.onreadystatechange=function() 
+		{
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) 
+			{
                 weekly_data = JSON.parse(xmlhttp.responseText);
 				google.charts.setOnLoadCallback(drawChart);
-
-
 			}
 		}
         xmlhttp.open("GET", path, true);
         xmlhttp.send();
-
 }
-
-
 function off() {
     document.getElementById("overlay").style.display = "none";
-
-
 }
-
-
 
 	///////////////////////////////////
 	///////// Clickable Map ///////////
 	///////////////////////////////////
-
-var infowindow;
-function makeClickable(map, circle, info) {
-
-     infowindow = new google.maps.InfoWindow({
-         content: info
+function makeClickable(map, marker, info) { 
+   	var infowindow = new google.maps.InfoWindow({
+         content: info        
+     });	
+	 
+     google.maps.event.addListener(marker, 'click', function() {   
+		marker.setAnimation(google.maps.Animation.BOUNCE);
+		map.panTo(marker.getPosition());
+		 
+		 
+     if(activeinfowindow) {activeinfowindow.close();}
+        infowindow.open(map,marker);
+        activeinfowindow = infowindow;     
      });
-     google.maps.event.addListener(circle, 'click', function(ev) {
-
-		
-		hideAllInfoWindows(map);
-       infowindow.setPosition(circle.getCenter());
-	   map.panTo(circle.getCenter());
-       infowindow.open(map);
-     });
-	markers.push(circle);
+	
+	marker.addListener('click', function () {
+    marker.setAnimation(null);
+});
+}
+function toggleBounce() {
+        if (marker.getAnimation() !== null) {
+          marker.setAnimation(null);
+        } else {
+          marker.setAnimation(google.maps.Animation.BOUNCE);
+        }
 }
 
-function hideAllInfoWindows(map) {
-	markers.forEach(function(circle){
-		infowindow.close(map,circle);
-				   });
-}
 
-////////////////////// draw stuff /////////////////////////////
-function drawChart() {
+function drawChart()
+{
 		var aBikes = [
 		[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20],[21],[22],[23]
 		];
-	// This loop populates the 2D list of times and average available bikes
 		for (i=0; i< weekly_data.length; i++){
 			for (j=0;j<24; j++){
 			if(weekly_data[i].Hour == j)
@@ -185,22 +130,19 @@ function drawChart() {
 		aBikes[8],aBikes[9],aBikes[10],aBikes[11],aBikes[12],aBikes[13],aBikes[14],aBikes[15],
 		aBikes[16],aBikes[17],aBikes[18],aBikes[19],aBikes[20],aBikes[21],aBikes[22],aBikes[23]
     ]);
-
-
 	// Set display options for the chart
-      var options = {
+      var options = 
+		  {
           title: 'Average Available Bikes',
           hAxis: {title: 'Hour',  titleTextStyle: {color: '#333'},
-				  // 'tick' values are the numerical values that are displayed on the x and y axis
 				  ticks:[1,3,5,7,9,11,13,15,17,19,21,23]},
-          vAxis: {title: 'Bikes',minValue: 0, maxValue:140,
-				 	ticks: [0,20,40,60,80,100,120,140,160]},
+          vAxis: {title: 'Bikes',minValue: 0, maxValue:100,
+				 	},
           isStacked: "true",
+		 // backgroundColor: { fill:'transparent' },
 		  width :1000,
           height:400
         };
-
 	    var chart = new google.visualization.AreaChart(document.getElementById('text'));
         chart.draw(data, options);
-
-            }
+}

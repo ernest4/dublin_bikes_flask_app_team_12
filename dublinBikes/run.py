@@ -33,14 +33,6 @@ def jcdAPItoFrontEnd():
 @application.route('/weekly/<stationNumber>')
 def weeklyJSONtoFrontEnd(stationNumber):
     queryResult = myDatabase.weeklyAvailableBikes(stationNumber)
-    #print(json.dumps(queryResult))
-
-    #preparing JSON for front end
-    #for dictionary in queryResult:
-    #    for key in dictionary:
-    #        if key == "Hour":
-    #            print(dictionary[key])
-
     return application.response_class(response=json.dumps(queryResult), status=200, mimetype='application/json')
 
 @application.route("/analytic/<stationNumber>")
@@ -51,7 +43,8 @@ def weeklyAnalyticJSONtoFrontEnd(stationNumber):
 def status():
     return "API scrapers <b>alive</b>: " + str(apiScarepThread.is_alive()) + \
         "<br><br>Last update:<br> Static [every 24h]: " + staticAPIlastScrape + \
-        " <br>Dynamic [every 5 minutes]: " + dynamicAPIlastScrape
+        " <br>Dynamic [every 5 minutes]: " + dynamicAPIlastScrape + \
+        " <br>Weather [every 5 minutes]: " + openWeatherAPIlastScrape
 
 
 

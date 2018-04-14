@@ -31,5 +31,5 @@ def dailyBarChart(stationID):
     
     return json.dumps(returnJSON)
     
-#dailyBarChart(42)
+dailyBarChart(42)
 

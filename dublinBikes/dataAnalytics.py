@@ -12,7 +12,6 @@ from sklearn.ensemble import RandomForestRegressor
 import requests,json,sys
 from builtins import str
 from datetime import datetime,timezone
-import time
 
 def getForecast():
     try:
@@ -36,10 +35,12 @@ def getForecast():
 #------------------------------------------------------------------------------ 
 # Function return a available bikes number.
 #------------------------------------------------------------------------------ 
-def analytic(stationID,dt):
+#def analytic(stationID,dt=datetime.utcnow()):
+def analytic(stationID):
     #------------------------------------------------------------------------------ 
     # Extract weekday and hour information from dt.
     #------------------------------------------------------------------------------ 
+    '''
     if isinstance(dt, str): 
         dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
     weekday = dt.weekday()
@@ -47,40 +48,127 @@ def analytic(stationID,dt):
     
     print("before correction:",dt.hour)
     
+    #if dt.hour % 3 + dt.hour >= 0
     while dt.hour % 3 != 0:
-        dt = dt.replace(hour = dt.hour -1)
+        dtAdjusted = dt.replace(hour = dt.hour -1)
         
     print("after correction:",dt.hour)
     
     timestamp = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    '''
+    weekday = datetime.utcnow().weekday()
+    hour = datetime.utcnow().hour
+    
+    bikeWeather = myDatabase.getBikeWeather(stationID)
     forecastJson = getForecast()
-    description = None
-    for i,dict in enumerate(forecastJson["list"]):
-        if forecastJson["list"][i]["dt"] == timestamp:
-            description = "description_"+ forecastJson["list"][i]["weather"][0]["description"]
-            #description = forecastJson["list"][i]["weather"][0]["description"]
-            if forecastJson["list"][i]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
-                weather = 1
-            else:
-                weather = 0
-    #Good weather: ['Clouds','Clear','Mist']
-    if description == None:
-        sys.exit("[Error 1] Fail to extract description from json.")
-    test = [weather,weekday,hour]
-    #'description_Sky is Clear', is the dummy not shown
+    testSet = []
     desList = [ 'description_broken clouds', 'description_clear sky', 'description_few clouds', 'description_fog', 'description_light intensity drizzle', 'description_light intensity drizzle rain', 'description_light intensity shower rain', 'description_light rain', 'description_light shower sleet', 'description_mist', 'description_moderate rain', 'description_proximity shower rain', 'description_scattered clouds', 'description_shower rain']
-    for d in desList:
-        if d == description:
-            test.append(1)
+    
+    if datetime.utcnow().hour % 3 == 0:
+        for i in range(1,3):
+            dt = datetime.utcnow().replace(hour = datetime.utcnow().hour + i)
+            test=[bikeWeather.iloc[-1]['weather'], dt.weekday(), dt.hour]
+            for d in desList:
+                if d == "description_" + bikeWeather.iloc[-1]['description']:
+                    test.append(1)
+                else:
+                    test.append(0)
+            testSet.append(test) 
+        
+    if datetime.utcnow().hour % 3 == 1:
+        #forecastJson = myDatabase.getOpenWeather()
+        dt = datetime.utcnow().replace(hour = datetime.utcnow().hour +1)
+        test=[bikeWeather.iloc[-1]['weather'], dt.weekday(), dt.hour]
+        for d in desList:
+            if d == "description_" + bikeWeather.iloc[-1]['description']:
+                test.append(1)
+            else:
+                test.append(0)
+        testSet.append(test)  
+    
+    #description = None
+    i=0
+    while len(testSet) <24:
+        if i % 3 == 0:
+    #for i,dict in enumerate(forecastJson["list"]):
+        #if forecastJson["list"][i]["dt"] == timestamp:
+            dt = datetime.fromtimestamp(forecastJson["list"][i]["dt"])
         else:
-            test.append(0)
+            dt = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).replace(hour = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).hour +1)
+            
+        hour = dt.hour
+        weekday = dt.weekday()
+        description = "description_"+ forecastJson["list"][i]["weather"][0]["description"]
+            #description = forecastJson["list"][i]["weather"][0]["description"]
+        if forecastJson["list"][i]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
+            weather = 1
+        else:
+            weather = 0
+        test = [weather,weekday,hour]
+        for d in desList:
+            if d == description:
+                test.append(1)
+            else:
+                test.append(0)
+        testSet.append(test)
+        i+=1
+        '''
+        
+        #Second Hour
+        dt = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).replace(hour = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).hour +1)
+        hour = dt.hour
+        weekday = dt.weekday()
+        description = "description_"+ forecastJson["list"][i]["weather"][0]["description"]
+            #description = forecastJson["list"][i]["weather"][0]["description"]
+        if forecastJson["list"][i]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
+            weather = 1
+        else:
+            weather = 0
+        test = [weather,weekday,hour]
+        for d in desList:
+            if d == description:
+                test.append(1)
+            else:
+                test.append(0)
+        testSet.append(test)
+        
+        #Third Hour
+        dt = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).replace(hour = datetime.fromtimestamp(forecastJson["list"][i]["dt"]).hour +1)
+        hour = dt.hour
+        weekday = dt.weekday()
+        description = "description_"+ forecastJson["list"][i]["weather"][0]["description"]
+            #description = forecastJson["list"][i]["weather"][0]["description"]
+        if forecastJson["list"][i]["weather"][0]["main"] in ['Clouds','Clear','Mist']:
+            weather = 1
+        else:
+            weather = 0
+        test = [weather,weekday,hour]
+        for d in desList:
+            if d == description:
+                test.append(1)
+            else:
+                test.append(0)
+        testSet.append(test)
+        
+        i+=1
+        '''
+        
+    #Good weather: ['Clouds','Clear','Mist']
+    #if description == None:
+     #   sys.exit("[Error 1] Fail to extract description from json.")
+    
+    #'description_Sky is Clear', is the dummy not shown
+    #desList = [ 'description_broken clouds', 'description_clear sky', 'description_few clouds', 'description_fog', 'description_light intensity drizzle', 'description_light intensity drizzle rain', 'description_light intensity shower rain', 'description_light rain', 'description_light shower sleet', 'description_mist', 'description_moderate rain', 'description_proximity shower rain', 'description_scattered clouds', 'description_shower rain']
+    
     #print(test)
-    testSet = np.asarray(test).reshape(1,-1)
+    #testSet = np.asarray(test)#.reshape(1,-1)
+    testSet = np.array([np.array(xi) for xi in testSet])
+    #print(testSet)
     
 #------------------------------------------------------------------------------ 
 # Random forest
 #------------------------------------------------------------------------------ 
-    bikeWeather = myDatabase.getBikeWeather(stationID)
+    #bikeWeather = myDatabase.getBikeWeather(stationID)
     #bikeWeather = myDatabase.getBikeWeather(42) #testing
     #print(bikeWeather)
     
@@ -101,7 +189,7 @@ def analytic(stationID,dt):
     
     #df_dummies = bikeWeather.join(pd.get_dummies(bikeWeather,drop_first=True))
     labels = np.array(bikeWeather['availableBikes'])
-    df_dummies = bikeWeather.drop(['humidity','temp','icon','availableBikes','datetime'],axis=1)
+    df_dummies = bikeWeather.drop(['availableBikes','datetime'],axis=1)
     df_dummies = pd.get_dummies(df_dummies,drop_first=True)
     #print(df_dummies)
     
@@ -137,7 +225,7 @@ def analytic(stationID,dt):
     #print('Mean Absolute Error:', round(np.mean(errors), 2))
     #Mean Absolute Error: 3.36 
     #print(predictions[0])
-    return predictions[0]
+    return predictions#[0]
 '''
 timeMilis = int(time.time() + 3600*1.5)
 print(timeMilis)
@@ -149,7 +237,7 @@ print(analytic(42, dtest))
 #print(analytic(42, datetime(2018, 4, 14, 16, 0)))
 #pre:24.586715367965375
 '''
-
+print(analytic(42))
 '''
 #------------------------------------------------------------------------------ 
 # Import tools needed for visualization

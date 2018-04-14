@@ -44,7 +44,7 @@ def status():
     return "API scrapers <b>alive</b>: " + str(apiScarepThread.is_alive()) + \
         "<br><br>Last update:<br> Static [every 24h]: " + staticAPIlastScrape + \
         " <br>Dynamic [every 5 minutes]: " + dynamicAPIlastScrape + \
-        " <br>Weather [every 5 minutes]: " + openWeatherAPIlastScrape
+        " <br>Weather [every 1h]: " + openWeatherAPIlastScrape
 
 
 

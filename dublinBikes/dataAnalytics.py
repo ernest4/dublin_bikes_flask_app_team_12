@@ -237,7 +237,7 @@ print(analytic(42, dtest))
 #print(analytic(42, datetime(2018, 4, 14, 16, 0)))
 #pre:24.586715367965375
 '''
-print(analytic(42))
+#print(analytic(42))
 '''
 #------------------------------------------------------------------------------ 
 # Import tools needed for visualization

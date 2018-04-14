@@ -346,12 +346,13 @@ def getBikeWeather(stationID):
     result = pd.concat([df_weather.set_index('Hourly'), df_bike_resamp], axis=1, join='inner')
     #print(result)
     
-    result = result.drop(['dt'],axis=1)
+    result = result.drop(['humidity','temp','icon','dt'],axis=1)
+    #df_dummies = bikeWeather.drop(['humidity','temp','icon','availableBikes','datetime'],axis=1)
     result = result[np.isfinite(result['availableBikes'])]
     #print(result)
     #print(list(zip(map(lambda x:x.isoformat(), result.index ), result.values))) 
     return result
     
-#getBikeWeather(42)
+print(getBikeWeather(42).iloc[-1])
     
 

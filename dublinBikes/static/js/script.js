@@ -4,6 +4,7 @@ var activeinfowindow;
 var markers = [];
 var marker;
 var weekly_data;
+var analytic_data;
 
 function initialize() {
     var mapOptions = {
@@ -42,7 +43,7 @@ function initialize() {
 					     "<h3 id=\"st_add\" style=\"margin:2px;color:black;font-size:16px;text-align: center;\">" +
                          data[i].address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +data[i].available_bikes +"&ensp;&ensp;|&ensp;&ensp;"+data[i].available_bike_stands +
  						"</br> bikes&emsp;stands</div> " +
-						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>";
+						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on2(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>";
                    makeClickable(map, marker, infoBox);
                 }
             }
@@ -52,18 +53,6 @@ function initialize() {
 }
 function on(st_ID) {
     document.getElementById("overlay").style.display = "block";
-//	var path = '/weekly/' + st_ID;
-//
-//	    var xmlhttp = new XMLHttpRequest();
-//        xmlhttp.onreadystatechange=function() {
-//            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-//                weekly_data = JSON.parse(xmlhttp.responseText);
-//                drawGraph();
-//            }
-//        }
-//        xmlhttp.open("GET", path, true);
-//        xmlhttp.send();
-	
 	var path = '/weekly/'+st_ID;
 	google.charts.load('current', {'packages':['corechart']});
 	var xmlhttp = new XMLHttpRequest();
@@ -72,19 +61,41 @@ function on(st_ID) {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) 
 			{
                 weekly_data = JSON.parse(xmlhttp.responseText);
+				console.log(weekly_data.length)
+				console.log(weekly_data[1])
 				google.charts.setOnLoadCallback(drawChart);
 			}
 		}
         xmlhttp.open("GET", path, true);
         xmlhttp.send();
 }
+
+//////////////////////////////////////////////////////////////////////////////
+
+function on2(st_ID) {
+    document.getElementById("overlay").style.display = "block";
+	var path = '/analytic/'+st_ID;
+	google.charts.load('current', {'packages':['corechart']});
+	var xmlhttp = new XMLHttpRequest();
+		console.log("analytics!")
+        xmlhttp.onreadystatechange=function() 
+		{
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) 
+			{
+                analytic_data = JSON.parse(xmlhttp.responseText);
+				google.charts.setOnLoadCallback(drawChart2);
+				console.log(analytic_data.length)
+				console.log(analytic_data[0])
+			}
+		}
+        xmlhttp.open("GET", path, true);
+        xmlhttp.send();
+}
+
 function off() {
     document.getElementById("overlay").style.display = "none";
 }
 
-	///////////////////////////////////
-	///////// Clickable Map ///////////
-	///////////////////////////////////
 function makeClickable(map, marker, info) { 
    	var infowindow = new google.maps.InfoWindow({
          content: info        
@@ -145,4 +156,47 @@ function drawChart()
         };
 	    var chart = new google.visualization.AreaChart(document.getElementById('text'));
         chart.draw(data, options);
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+function drawChart2()
+{
+		var bBikes = [
+		[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20],[21],[22],[23]
+		];
+		for (i=0; i< analytic_data.length; i++){
+			for (j=0;j<24; j++){
+			if(analytic_data[i].Hour == j)
+				bBikes[j].push(analytic_data[i].avgAvailableBikes)
+			}
+		}
+		
+
+	
+    console.log(bBikes[0])
+	    var data2 = google.visualization.arrayToDataTable([
+        ['Hour', 'available'],
+        bBikes[0],bBikes[1],bBikes[2],bBikes[3],bBikes[4],bBikes[5],bBikes[6],bBikes[7],
+		bBikes[8],bBikes[9],bBikes[10],bBikes[11],bBikes[12],bBikes[13],bBikes[14],bBikes[15],
+		bBikes[16],bBikes[17],bBikes[18],bBikes[19],bBikes[20],bBikes[21],bBikes[22],bBikes[23]
+    ]);
+
+      var options2 = 
+		  {
+          title: 'Rain Day Bike Averages',
+          hAxis: {title: 'hours from now',  titleTextStyle: {color: '#333'},
+				  ticks:['1','3','5','7','9','11','13','15','17','19','21','23']},
+          vAxis: {title: 'Bikes'
+				 	},
+          isStacked: "true",
+		 // backgroundColor: { fill:'transparent' },
+		  width :1000,
+          height:400
+        };
+	    var chart2 = new google.visualization.AreaChart(document.getElementById('text'));
+        chart2.draw(data2, options2);
 }

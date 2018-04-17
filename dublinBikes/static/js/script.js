@@ -84,8 +84,6 @@ function on2(st_ID) {
 			{
                 analytic_data = JSON.parse(xmlhttp.responseText);
 				google.charts.setOnLoadCallback(drawChart2);
-				console.log(analytic_data.length)
-				console.log(analytic_data[0])
 			}
 		}
         xmlhttp.open("GET", path, true);
@@ -165,31 +163,35 @@ function drawChart()
 
 function drawChart2()
 {
-		var bBikes = [
-		[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20],[21],[22],[23]
-		];
-		for (i=0; i< analytic_data.length; i++){
-			for (j=0;j<24; j++){
-			if(analytic_data[i].Hour == j)
-				bBikes[j].push(analytic_data[i].avgAvailableBikes)
-			}
+		var bBikes = new Array(24);
+		var tickz = new Array(24);
+		for (i=0; i < analytic_data.length; i++){
+				console.log(analytic_data.length);
+				console.log(bBikes);
+				bBikes[i] = new Array(2);
+				bBikes[i][0] =''+ analytic_data[i].Hour;
+				bBikes[i][1] = analytic_data[i].avgAvailableBikes;
+				//tickz[i] = ''+analytic_data[i].Hour;
+			
 		}
+	console.log(tickz);
 		
-
+// bBikes=[]
 	
-    console.log(bBikes[0])
+   
 	    var data2 = google.visualization.arrayToDataTable([
         ['Hour', 'available'],
         bBikes[0],bBikes[1],bBikes[2],bBikes[3],bBikes[4],bBikes[5],bBikes[6],bBikes[7],
 		bBikes[8],bBikes[9],bBikes[10],bBikes[11],bBikes[12],bBikes[13],bBikes[14],bBikes[15],
 		bBikes[16],bBikes[17],bBikes[18],bBikes[19],bBikes[20],bBikes[21],bBikes[22],bBikes[23]
-    ]);
+    ], false);
+	
+	console.log(data2);
 
       var options2 = 
 		  {
-          title: 'Rain Day Bike Averages',
-          hAxis: {title: 'hours from now',  titleTextStyle: {color: '#333'},
-				  ticks:['1','3','5','7','9','11','13','15','17','19','21','23']},
+          title: 'Inclement Weather Hourly Averages ',
+          hAxis: {title: 'hours from now',  titleTextStyle: {color: '#333'}},
           vAxis: {title: 'Bikes'
 				 	},
           isStacked: "true",

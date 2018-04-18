@@ -64,17 +64,17 @@ def scrapeJCDAPI():
             justStarted = False
             scrapeCount = 0
             staticAPIlastScrape = "Scrapping API... Populating Static data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
-            print(staticAPIlastScrape)
             myDatabase.populateStaticTable(jcdAPIquery)
+            print(staticAPIlastScrape)
         else: # Run about every 5 minutes...
             scrapeCount += 1
             dynamicAPIlastScrape = "Scrapping API... Populating Dynamic data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600)) + " <b>total scrape count</b>: " + str(scrapeCount)
-            print(dynamicAPIlastScrape)
             myDatabase.populateDynamicTable(jcdAPIquery)
+            print(dynamicAPIlastScrape)
             if scrapeCount % 12 == 0: #Every Hour
                 openWeatherAPIlastScrape = "Scrapping API... Populating Weather data. <b>Time milis</b>: " + str(time.time()*1000 + 3600) + " <b>Time</b>: " + str(datetime.fromtimestamp(time.time() + 3600))
-                print(openWeatherAPIlastScrape)
                 myDatabase.populateCurrentWeather(getOpenWeather())
+                print(openWeatherAPIlastScrape)
 
         time.sleep(60*5) #Scrape about every 5 minutes...
 

@@ -16,25 +16,30 @@ from datetime import datetime
 # Get forecast from open weather API, return a json file.
 #------------------------------------------------------------------------------ 
 def getForecast():
+    '''Get forecast from open weather 5 day / 3 hours API.
+    Return a json file.'''
+    
     try:
         request = requests.get('http://openweathermap.org/data/2.5/forecast?q=dublin&appid=b6907d289e10d714a6e88b30761fae22').content.decode('utf-8')
         forecastJson = json.loads(request)
-        #print(stationsJson[0])
 
         if forecastJson != None:
-            #print(currentWeatherJson)
+            
             return forecastJson
         else:
             print('[Error 0] The json is empty.')
     
     except (ValueError, requests.exceptions.RequestException) as e:
-        #print(e)
+        
         sys.exit(e)
 
 #------------------------------------------------------------------------------ 
 # Function return a available bikes number.
 #------------------------------------------------------------------------------ 
 def analytic(stationID):
+    '''Our analytic function. Provides prediction of available bikes in next 24 hours based on weather report
+    of that hour.'''
+    
     #Start with time of now.
     weekday = datetime.utcnow().weekday()
     hour = datetime.utcnow().hour
@@ -185,6 +190,3 @@ export_graphviz(tree, out_file = 'tree.dot', feature_names = feature_list, round
 # Write graph to a png file
 graph.write_png('tree.png')
 '''
-
-
-#print(list(zip(map(lambda x:x.isoformat(), bikeWeather.index ), bikeWeather .values)))

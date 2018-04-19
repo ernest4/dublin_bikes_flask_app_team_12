@@ -5,11 +5,8 @@ var markers = [];
 var marker;
 var weekly_data;
 var analytic_data;
-var bikes;
-var stands;
-var position;
-var address;
 
+///////// This function opens a map and populates it with markers
 function initialize() {
     var mapOptions = {
         center:new google.maps.LatLng(53.3498,-6.2603),
@@ -19,33 +16,28 @@ function initialize() {
     };
     var map=new google.maps.Map(document.getElementById("dublin_map"),mapOptions);
     var url="/jcdapi"
-    // Station coordinates are retrieved from JSON  data
     var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 data = JSON.parse(xmlhttp.responseText);
                 for (var i=0;i<data.length;i++) {
                     var colour;
-						bikes = data[i].available_bikes;
-						stands = data[i].bike_stands;
-						position = {lat: data[i].position.lat, lng: data[i].position.lng};
-						address = data[i].address;
-
-                    if (bikes/stands < 0.2) {
-                        colour = 'red';
-                    }else if (0.2 <= bikes/stands  && bikes/stands <= 0.8) {
-                        colour = 'orange';
-                    } else {
-                        colour = 'green';
-                    };
-           
-                   marker = new google.maps.Marker({
+					var	bikes = data[i].available_bikes;
+					var	stands = data[i].bike_stands;
+					var	position = {lat: data[i].position.lat, lng: data[i].position.lng};
+					var	address = data[i].address;
+					
+                    if (bikes/stands < 0.1) {colour = 'red';}
+					else if (0.1 <= bikes/stands  && bikes/stands <= 0.8) {colour = 'orange';}
+					else {colour = 'green';};
+					
+                    marker = new google.maps.Marker({
                         position: position,
                         map: map,
                         icon: 'http://maps.google.com/mapfiles/ms/icons/' + colour +'-dot.png',
 					    animation: google.maps.Animation.DROP
                     });
-
+					
                     infoBox =
 					     "<h3 id=\"st_add\" style=\"margin:2px;color:black;font-size:16px;text-align: center;\">" +
                          address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +bikes +"&ensp;&ensp;|&ensp;&ensp;"+stands +
@@ -58,6 +50,11 @@ function initialize() {
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
 }
+
+
+////////////// This function is called by the user clicking a button in the infowindow on the map
+////////////// It takes a station ID as input and makes a JSON call   
+
 function on(st_ID) {
     document.getElementById("overlay").style.display = "block";
 	var path = '/weekly/'+st_ID;
@@ -78,6 +75,7 @@ function on(st_ID) {
 //////////////////////////////////////////////////////////////////////////////
 function on2(st_ID) {
     document.getElementById("overlay").style.display = "block";
+	
 	var path = '/analytic/'+st_ID;
 	google.charts.load('current', {'packages':['corechart']});
 	document.getElementById('text').innerHTML = "... loading graph ..."; // add gif here
@@ -87,16 +85,19 @@ function on2(st_ID) {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
 			{
                 analytic_data = JSON.parse(xmlhttp.responseText);
-				google.charts.setOnLoadCallback(drawChart2);
+				google.charts.setOnLoadCallback(drawChart1+number);
 			}
 		}
         xmlhttp.open("GET", path, true);
         xmlhttp.send();
 }
-
+//////////// This function closes the overlay by clicking on it
 function off() {
     document.getElementById("overlay").style.display = "none";
 }
+
+/////////// This function allows a map marker to be clicked
+/////////// The clicked marker bounces and an infowidow opens
 function makeClickable(map, marker, info) {
    	var infowindow = new google.maps.InfoWindow({
          content: info
@@ -113,6 +114,7 @@ function makeClickable(map, marker, info) {
     marker.setAnimation(null);
 });
 }
+/////////// This function adds animation to the markers
 function toggleBounce() {
         if (marker.getAnimation() !== null) {
           marker.setAnimation(null);
@@ -120,7 +122,10 @@ function toggleBounce() {
           marker.setAnimation(google.maps.Animation.BOUNCE);
         }
 }
-function drawChart()
+
+/////// this function draws the chart of weekly predictions, average available bikes per hour per day
+/////// all displayed in a 'stacked graph'
+function drawChart1()
 {
 	var aBikes = [
 		[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20],[21],[22],[23]
@@ -137,7 +142,7 @@ function drawChart()
 		aBikes[8],aBikes[9],aBikes[10],aBikes[11],aBikes[12],aBikes[13],aBikes[14],aBikes[15],
 		aBikes[16],aBikes[17],aBikes[18],aBikes[19],aBikes[20],aBikes[21],aBikes[22],aBikes[23]
     ]);
-	// Set display options for the chart
+
       var options =
 		  {
           title: 'Average Available Bikes',
@@ -152,7 +157,9 @@ function drawChart()
 	    var chart = new google.visualization.AreaChart(document.getElementById('text'));
         chart.draw(data, options);
 }
-/////////////////////////////////////////////////////////////////////////////////////
+
+////////// This function draws the second chart,
+////////// It displays predicted bike availability according to real weather data
 function drawChart2()
 {
 		var bBikes = new Array(24);

@@ -32,15 +32,13 @@ function initialize() {
 							console.log("Do something!")
 						}
 					}
-                    if (bikes/stands < 0.2) {
+                    if (bikes/stands < 0.1) {
                         colour = 'red';	
-                    }else if (0.2 <= bikes/stands  && bikes/stands <= 0.8) {
+                    }else if (0.1 <= bikes/stands  && bikes/stands <= 0.8) {
                         colour = 'orange';
                     } else {
                         colour = 'green';
                     };
-                    // markers on map
-                  // var positioN = {lat: data[i].position.lat, lng: data[i].position.lng}
                    marker = new google.maps.Marker({
                         position: position,
                         map: map,

@@ -24,18 +24,13 @@ function initialize() {
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 data = JSON.parse(xmlhttp.responseText);
-                for (var i=0;i<=data.length;i++) {
+                for (var i=0;i<data.length;i++) {
                     var colour;
-					try {
 						bikes = data[i].available_bikes;
 						stands = data[i].bike_stands;
 						position = {lat: data[i].position.lat, lng: data[i].position.lng};
 						address = data[i].address;
-					} catch(e){
-						if(e){
-							console.log("This will load.")
-						}
-					}
+
                     if (bikes/stands < 0.2) {
                         colour = 'red';
                     }else if (0.2 <= bikes/stands  && bikes/stands <= 0.8) {
@@ -43,8 +38,7 @@ function initialize() {
                     } else {
                         colour = 'green';
                     };
-                    // markers on map
-                  // var positioN = {lat: data[i].position.lat, lng: data[i].position.lng}
+           
                    marker = new google.maps.Marker({
                         position: position,
                         map: map,
@@ -59,7 +53,7 @@ function initialize() {
 						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on2(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>";
                    makeClickable(map, marker, infoBox);
                 }
-            }
+            }	
         }
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
@@ -68,7 +62,8 @@ function on(st_ID) {
     document.getElementById("overlay").style.display = "block";
 	var path = '/weekly/'+st_ID;
 	google.charts.load('current', {'packages':['corechart']});
-	var xmlhttp = new XMLHttpRequest();
+	document.getElementById('text').innerHTML = "... loading graph ...";
+	var xmlhttp = new XMLHttpRequest();										
         xmlhttp.onreadystatechange=function()
 		{
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
@@ -85,6 +80,7 @@ function on2(st_ID) {
     document.getElementById("overlay").style.display = "block";
 	var path = '/analytic/'+st_ID;
 	google.charts.load('current', {'packages':['corechart']});
+	document.getElementById('text').innerHTML = "... loading graph ..."; // add gif here
 	var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange=function()
 		{
@@ -126,7 +122,7 @@ function toggleBounce() {
 }
 function drawChart()
 {
-		var aBikes = [
+	var aBikes = [
 		[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20],[21],[22],[23]
 		];
 		for (i=0; i< weekly_data.length; i++){
@@ -150,7 +146,6 @@ function drawChart()
           vAxis: {title: 'Bikes',minValue: 0, maxValue:100,
 				 	},
           isStacked: "true",
-		 // backgroundColor: { fill:'transparent' },
 		  width :1000,
           height:400
         };
@@ -180,7 +175,6 @@ function drawChart2()
           vAxis: {title: 'Bikes'
 				 	},
           isStacked: "true",
-		 // backgroundColor: { fill:'transparent' },
 		  width :1000,
           height:400
         };

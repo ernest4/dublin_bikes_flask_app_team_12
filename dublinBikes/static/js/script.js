@@ -31,18 +31,20 @@ function initialize() {
 					else if (0.1 <= bikes/stands  && bikes/stands <= 0.8) {colour = 'orange';}
 					else {colour = 'green';};
 					
-                    marker = new google.maps.Marker({
+                    marker = new google.maps.Marker
+					({
                         position: position,
                         map: map,
                         icon: 'http://maps.google.com/mapfiles/ms/icons/' + colour +'-dot.png',
 					    animation: google.maps.Animation.DROP
+						
                     });
-					
                     infoBox =
 					     "<h3 id=\"st_add\" style=\"margin:2px;color:black;font-size:16px;text-align: center;\">" +
-                         address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +bikes +"&ensp;&ensp;|&ensp;&ensp;"+stands +
- 						"</br> bikes&emsp;stands</div> " +
-						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on2(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>";
+                         address + 
+						"</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" 
+						+bikes +"&ensp;&ensp;|&ensp;&ensp;"+stands +"</br> bikes&emsp;stands</div> " +
+						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on2(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i + "\')\"> &#x1F4C8</button>";	
                    makeClickable(map, marker, infoBox);
                 }
             }	
@@ -50,7 +52,6 @@ function initialize() {
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
 }
-
 
 ////////////// This function is called by the user clicking a button in the infowindow on the map
 ////////////// It takes a station ID as input and makes a JSON call   
@@ -66,13 +67,14 @@ function on(st_ID) {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
 			{
                 weekly_data = JSON.parse(xmlhttp.responseText);
-				google.charts.setOnLoadCallback(drawChart);
+				google.charts.setOnLoadCallback(drawChart1);
 			}
 		}
         xmlhttp.open("GET", path, true);
         xmlhttp.send();
 }
-//////////////////////////////////////////////////////////////////////////////
+////////////// This function is called by the user clicking a button in the infowindow on the map
+////////////// It makes a new JSON call 
 function on2(st_ID) {
     document.getElementById("overlay").style.display = "block";
 	
@@ -85,7 +87,7 @@ function on2(st_ID) {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
 			{
                 analytic_data = JSON.parse(xmlhttp.responseText);
-				google.charts.setOnLoadCallback(drawChart1+number);
+				google.charts.setOnLoadCallback(drawChart2);
 			}
 		}
         xmlhttp.open("GET", path, true);
@@ -127,6 +129,7 @@ function toggleBounce() {
 /////// all displayed in a 'stacked graph'
 function drawChart1()
 {
+	document.getElementById('text').innerHTML = "";
 	var aBikes = [
 		[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20],[21],[22],[23]
 		];
@@ -152,7 +155,8 @@ function drawChart1()
 				 	},
           isStacked: "true",
 		  width :1000,
-          height:400
+          height:400,
+          is3D:true
         };
 	    var chart = new google.visualization.AreaChart(document.getElementById('text'));
         chart.draw(data, options);
@@ -162,6 +166,7 @@ function drawChart1()
 ////////// It displays predicted bike availability according to real weather data
 function drawChart2()
 {
+	document.getElementById('text').innerHTML = "";
 		var bBikes = new Array(24);
 		var tickz = new Array(24);
 		for (i=0; i < analytic_data.length; i++){

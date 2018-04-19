@@ -254,7 +254,7 @@ header {
 
 /* logo text */
 h2, h3 {
-    color: #fff;
+    color: whitesmoke;
 	font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif;
 	font-style: normal;
 	font-variant: normal;
@@ -270,4 +270,5 @@ h2 {
 h3 {
 	font-size: 14px;
 	line-height: 15.4px;
+	font-weight: 100
 }

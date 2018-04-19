@@ -20,28 +20,37 @@ function initialize() {
         xmlhttp.onreadystatechange=function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 data = JSON.parse(xmlhttp.responseText);
-                for (i=0;i<=data.length;i++) {
+                for (var i=0;i<=data.length;i++) {
                     var colour;
-                    if (data[i].available_bikes/data[i].bike_stands < 0.2) {
-                        colour = 'red';
-                    }else if (0.2 <= data[i].available_bikes/data[i].bike_stands && data[i].available_bikes/data[i].bike_stands <= 0.8) {
+					try {
+						var bikes = data[i].available_bikes;
+						var stands = data[i].bike_stands;
+						var position = {lat: data[i].position.lat, lng: data[i].position.lng};
+						var address = data[i].address;
+					} catch(e){
+						if(e){
+							console.log("Do something!")
+						}
+					}
+                    if (bikes/stands < 0.2) {
+                        colour = 'red';	
+                    }else if (0.2 <= bikes/stands  && bikes/stands <= 0.8) {
                         colour = 'orange';
                     } else {
                         colour = 'green';
                     };
                     // markers on map
-                   var positioN = {lat: data[i].position.lat, lng: data[i].position.lng}
+                  // var positioN = {lat: data[i].position.lat, lng: data[i].position.lng}
                    marker = new google.maps.Marker({
-                        position: positioN,
+                        position: position,
                         map: map,
                         icon: 'http://maps.google.com/mapfiles/ms/icons/' + colour +'-dot.png',
 					    animation: google.maps.Animation.DROP
                     });
 					
                     infoBox =
-    
 					     "<h3 id=\"st_add\" style=\"margin:2px;color:black;font-size:16px;text-align: center;\">" +
-                         data[i].address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +data[i].available_bikes +"&ensp;&ensp;|&ensp;&ensp;"+data[i].available_bike_stands +
+                         address + "</h3></br><div style=\"color:black;font-size:25px;text-align: center;\">" +bikes +"&ensp;&ensp;|&ensp;&ensp;"+stands +
  						"</br> bikes&emsp;stands</div> " +
 						 "<br/><button class=btn   style=\"float: left;\"   onclick=\"on2(\'"+ i+ "\')\">&#x2614</button >&ensp;&ensp;<button class=btn style=\"float: right;\"  onclick=\"on(\'"+ i+ "\')\"> &#x1F4C8</button>";
                    makeClickable(map, marker, infoBox);
@@ -61,23 +70,18 @@ function on(st_ID) {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) 
 			{
                 weekly_data = JSON.parse(xmlhttp.responseText);
-				console.log(weekly_data.length)
-				console.log(weekly_data[1])
 				google.charts.setOnLoadCallback(drawChart);
 			}
 		}
         xmlhttp.open("GET", path, true);
         xmlhttp.send();
 }
-
 //////////////////////////////////////////////////////////////////////////////
-
 function on2(st_ID) {
     document.getElementById("overlay").style.display = "block";
 	var path = '/analytic/'+st_ID;
 	google.charts.load('current', {'packages':['corechart']});
 	var xmlhttp = new XMLHttpRequest();
-		console.log("analytics!")
         xmlhttp.onreadystatechange=function() 
 		{
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) 
@@ -93,17 +97,13 @@ function on2(st_ID) {
 function off() {
     document.getElementById("overlay").style.display = "none";
 }
-
 function makeClickable(map, marker, info) { 
    	var infowindow = new google.maps.InfoWindow({
          content: info        
      });	
-	 
      google.maps.event.addListener(marker, 'click', function() {   
 		marker.setAnimation(google.maps.Animation.BOUNCE);
 		map.panTo(marker.getPosition());
-		 
-		 
      if(activeinfowindow) {activeinfowindow.close();}
         infowindow.open(map,marker);
         activeinfowindow = infowindow;     
@@ -120,8 +120,6 @@ function toggleBounce() {
           marker.setAnimation(google.maps.Animation.BOUNCE);
         }
 }
-
-
 function drawChart()
 {
 		var aBikes = [
@@ -155,39 +153,23 @@ function drawChart()
 	    var chart = new google.visualization.AreaChart(document.getElementById('text'));
         chart.draw(data, options);
 }
-
-
-
-
 /////////////////////////////////////////////////////////////////////////////////////
-
 function drawChart2()
 {
 		var bBikes = new Array(24);
 		var tickz = new Array(24);
 		for (i=0; i < analytic_data.length; i++){
-				console.log(analytic_data.length);
-				console.log(bBikes);
 				bBikes[i] = new Array(2);
 				bBikes[i][0] =''+ analytic_data[i].Hour;
-				bBikes[i][1] = analytic_data[i].avgAvailableBikes;
-				//tickz[i] = ''+analytic_data[i].Hour;
-			
+				bBikes[i][1] = analytic_data[i].avgAvailableBikes;	
 		}
 	console.log(tickz);
-		
-// bBikes=[]
-	
-   
 	    var data2 = google.visualization.arrayToDataTable([
         ['Hour', 'available'],
         bBikes[0],bBikes[1],bBikes[2],bBikes[3],bBikes[4],bBikes[5],bBikes[6],bBikes[7],
 		bBikes[8],bBikes[9],bBikes[10],bBikes[11],bBikes[12],bBikes[13],bBikes[14],bBikes[15],
 		bBikes[16],bBikes[17],bBikes[18],bBikes[19],bBikes[20],bBikes[21],bBikes[22],bBikes[23]
     ], false);
-	
-	console.log(data2);
-
       var options2 = 
 		  {
           title: 'Inclement Weather Hourly Averages ',

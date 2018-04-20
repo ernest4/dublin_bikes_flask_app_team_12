@@ -268,7 +268,8 @@ h2 {
 
 }
 h3 {
-	font-size: 14px;
+	font-size: 12px;
 	line-height: 15.4px;
-	font-weight: 100
+	font-weight: 100;
+	font-style: italic
 }

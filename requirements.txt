@@ -23,7 +23,7 @@ flaskSysInfo==1.0
 future==0.16.0
 idna==2.6
 itsdangerous==0.24
-Jinja2==2.10
+Jinja2==2.11.3
 jinja2-time==0.2.0
 jmespath==0.9.3
 -e git+https://github.com/ernest4/light_checker_assignmnet3.git@c691f9efc05e89dfe867e6bfb55f50b24c643ff4#egg=light_counter

@@ -1,5 +1,5 @@
 aniso8601==3.0.0
-arrow==0.12.1
+arrow==0.15.1
 attrs==17.4.0
 awsebcli==3.12.4
 binaryornot==0.4.4
